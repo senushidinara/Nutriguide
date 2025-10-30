@@ -1,0 +1,5 @@
+{
+  "name": "NutriGuide: AI Energy Simulator",
+  "description": "A personalized, predictive energy management system that simulates how meals affect your physical, cognitive, and emotional health. It uses AI to provide dynamic recommendations and visualize your body's energy response in real-time.",
+  "requestFramePermissions": []
+}
