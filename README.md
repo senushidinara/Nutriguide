@@ -152,6 +152,103 @@ Sketched the Energy Map UI 🗺️ with vibrant, real-time feedback loops 🔄�
 
 </details>
 
+
+
+
+
+## 🧠 System Architecture Diagram
+
+```
+                 ┌───────────────────────────────┐
+                 │       USER DEVICES 📱💻        │
+                 │ Mobile App (Flutter/React)    │
+                 │ Web Dashboard 🌐              │
+                 └───────────────┬───────────────┘
+                                 │
+                                 ▼
+                 ┌───────────────────────────────┐
+                 │   CHATBOT INTERFACE 🤖💬       │
+                 │ Gemini API 🌟                  │
+                 │ Conversational Guidance 🗨️     │
+                 │ Meal Suggestions 🍳🥗🥩        │
+                 └───────────────┬───────────────┘
+                                 │
+                                 ▼
+                 ┌───────────────────────────────┐
+                 │       BACKEND API 🐍          │
+                 │ FastAPI / Flask ⚡             │
+                 │ Process Inputs & Preferences  │
+                 │ Calls AI Recommendation Engine│
+                 └───────────────┬───────────────┘
+                                 │
+                                 ▼
+                 ┌───────────────────────────────┐
+                 │ AI RECOMMENDATION ENGINE 🤖✨  │
+                 │ Multi-agent ML for Nutrition  │
+                 │ Predicts Meal Combos & Calories 📊💪 │
+                 │ Personalized Profile Adjustments 🧍‍♂️🧍‍♀️ │
+                 └───────────────┬───────────────┘
+                                 │
+                                 ▼
+                 ┌───────────────────────────────┐
+                 │ DATABASE & STORAGE 🗄️☁️       │
+                 │ Firebase / Firestore 🗂️       │
+                 │ Cloud SQL / Spanner 💾         │
+                 │ User Profiles, History 📋      │
+                 │ Meal & Recipe DB 🥘            │
+                 └───────────────┬───────────────┘
+                                 │
+                                 ▼
+                 ┌───────────────────────────────┐
+                 │     CLOUD SERVICES 🌐💎        │
+                 │ App Engine / Cloud Run 🚀      │
+                 │ Cloud Functions ⚡             │
+                 │ BigQuery 📊                   │
+                 │ Vertex AI 🤖                  │
+                 │ Cloud Storage ☁️              │
+                 │ Pub/Sub 🔔                     │
+                 │ Secret Manager 🔐             │
+                 │ Logging & Monitoring 📈       │
+                 │ IAM 🛡️                        │
+                 └───────────────────────────────┘
+```
+
+## 🔄 Workflow Snapshot
+
+- 👤 User logs in and sets personal data & dietary goals  
+- 🤖 Chatbot (Gemini API) guides meal selection with smart questions  
+- 🐍 Backend processes inputs and routes to AI engine  
+- 🍳 AI predicts optimal meals, calories, macros, and wellness plans  
+- ☁️ Data stored in Firestore/SQL and synced across cloud services  
+- 📲 User receives personalized suggestions and real-time feedback  
+- 🔔 Notifications & reminders delivered via Pub/Sub  
+
+──────────────────────────────────────────────
+
+## 🧩 Feature Highlights
+
+- 🥗 Drag-and-drop meal planner  
+- ⚡ Personalized energy simulations  
+- 🍱 Smart food combo suggestions  
+- 🗺️ Energy Map visualization  
+- 💖 Emotional energy tracking  
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React Native / Flutter  
+- **Backend:** FastAPI / Flask  
+- **Database:** Firebase, Firestore, Cloud SQL  
+- **AI Models:** Multi-agent ML for nutrition prediction  
+- **Cloud:** App Engine, Cloud Run, BigQuery, Vertex AI  
+
+## 🎯 Impact
+
+- 🔋 Maximize daily energy  
+- 🧠 Decode cognitive and emotional responses to food  
+- 🌍 Personalize nutrition across cultures and goals  
+
+
+
 ## Run Locally
 
 **Prerequisites:**  Node.js
