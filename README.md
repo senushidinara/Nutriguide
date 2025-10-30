@@ -1,4 +1,4 @@
-<# 🥗⚡ NutriGuide – Quantum Nutrition & Energy Simulator
+🥗⚡ NutriGuide – Quantum Nutrition & Energy Simulator
 
 ✨ “Predict, personalize, optimize — your energy, your way.” ✨
 
@@ -221,9 +221,7 @@ Sketched the Energy Map UI 🗺️ with vibrant, real-time feedback loops 🔄�
 - 🍳 AI predicts optimal meals, calories, macros, and wellness plans  
 - ☁️ Data stored in Firestore/SQL and synced across cloud services  
 - 📲 User receives personalized suggestions and real-time feedback  
-- 🔔 Notifications & reminders delivered via Pub/Sub  
-
-──────────────────────────────────────────────
+- 🔔 Notifications & reminders delivered via pub
 
 ## 🧩 Feature Highlights
 
