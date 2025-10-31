@@ -38,31 +38,43 @@ const FoodSelector: React.FC<FoodSelectorProps> = ({ onSelectFood }) => {
 
   return (
     <div className="bg-brand-surface/60 backdrop-blur-xl border border-brand-primary/20 rounded-2xl shadow-2xl shadow-brand-primary/10 h-full flex flex-col overflow-hidden">
-        <div className="p-4 border-b border-brand-primary/10 flex-shrink-0">
-             <h2 className="text-xl font-bold text-brand-secondary">Nutrient Library</h2>
+        <div className="p-6 border-b border-brand-primary/10 flex-shrink-0 bg-gradient-to-r from-brand-primary/10 to-brand-accent/10">
+             <h2 className="text-2xl font-bold text-brand-secondary">✨ Nutrient Library</h2>
+             <p className="text-sm text-brand-text-muted mt-1">Explore & select foods to build your meal</p>
         </div>
-        <div className="flex-grow overflow-y-auto p-4">
-        {categoryOrder.map(category => (
+        <div className="flex-grow overflow-y-auto p-6">
+        {categoryOrder.map((category, categoryIndex) => (
         categorizedFoods[category] && (
-            <div key={category} className="mb-6">
-            <h3 className="text-lg font-semibold text-brand-accent capitalize sticky top-0 bg-brand-surface/80 backdrop-blur-sm py-2 z-10 -mx-4 px-4 border-b border-t border-brand-primary/10">{category.replace('_', ' ')}s</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
-                {categorizedFoods[category].map(food => (
+            <div key={category} className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-1 w-6 bg-gradient-to-r from-brand-accent to-brand-primary rounded-full"></div>
+              <h3 className="text-lg font-bold text-brand-accent capitalize">{category.replace('_', ' ')}</h3>
+              <span className="text-xs text-brand-text-muted ml-auto">{categorizedFoods[category].length} items</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {categorizedFoods[category].map((food, foodIndex) => (
                     <button
                       key={food.id}
                       onClick={() => onSelectFood(food)}
-                      className="group relative aspect-square bg-brand-bg/50 rounded-lg overflow-hidden border border-brand-primary/20 hover:border-brand-accent/80 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-brand-accent/60 ring-offset-2 ring-offset-brand-surface"
+                      className="group relative aspect-square bg-brand-bg/40 rounded-xl overflow-hidden border border-brand-primary/30 hover:border-brand-accent transition-all duration-400 focus:outline-none focus:ring-4 focus:ring-brand-accent/60 ring-offset-2 ring-offset-brand-surface hover:shadow-2xl hover:shadow-brand-accent/20"
+                      style={{ animationDelay: `${(categoryIndex * 6 + foodIndex) * 30}ms` }}
                     >
                       <img
                           src={food.imageUrl}
                           alt={food.name}
-                          className="absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                          className="absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-120 group-hover:brightness-110 opacity-75 group-hover:opacity-100"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                      <div className="absolute inset-0 p-2 flex flex-col justify-end text-left">
-                          <p className="font-bold text-white text-sm drop-shadow-lg">{food.name}</p>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent group-hover:from-black/60 transition-all duration-300" />
+                      <div className="absolute inset-0 p-3 flex flex-col justify-between">
+                        <div className="text-right opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <span className="text-xl drop-shadow-lg">{food.emoji}</span>
+                        </div>
+                        <div>
+                          <p className="font-bold text-white text-sm drop-shadow-lg leading-tight">{food.name}</p>
+                          <p className="text-xs text-white/70 drop-shadow-lg mt-1">{food.nutrition.calories} cal</p>
+                        </div>
                       </div>
-                       <div className="absolute top-2 right-2 text-2xl drop-shadow-lg transition-transform duration-300 group-hover:scale-125">{food.emoji}</div>
+                      <div className="absolute bottom-2 right-2 text-2xl opacity-100 group-hover:opacity-0 transition-opacity duration-300 drop-shadow-lg">{food.emoji}</div>
                     </button>
                 ))}
             </div>
