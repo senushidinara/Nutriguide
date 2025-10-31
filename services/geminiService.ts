@@ -98,7 +98,7 @@ export const getMealSimulation = async (userProfile: UserProfile, meal: FoodItem
 
     const systemInstruction = "You are NutriGuide, a personalized, predictive, multi-dimensional energy management AI. Your purpose is to simulate how meals affect a user's energy. You must provide detailed, actionable, and scientifically-plausible insights. Always respond with a valid JSON object matching the specified schema, with no additional text or markdown formatting.";
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
         model: model,
         contents: prompt,
         config: {
@@ -150,7 +150,7 @@ export const startChatSession = (userProfile: UserProfile, meal: FoodItem[], sim
         }
     ];
     
-    chatSession = ai.chats.create({
+    chatSession = getAI().chats.create({
         model: 'gemini-2.5-flash',
         config: { systemInstruction },
         history: initialHistory,
