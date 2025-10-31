@@ -1,13 +1,19 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import { UserProfile, FoodItem, SimulationResult } from "../types";
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;
 
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable is not set.");
-}
+let ai: GoogleGenAI | null = null;
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const getAI = () => {
+  if (!ai) {
+    if (!API_KEY) {
+      throw new Error("GEMINI_API_KEY environment variable is not set. Please configure your API key.");
+    }
+    ai = new GoogleGenAI({ apiKey: API_KEY });
+  }
+  return ai;
+};
 let chatSession: Chat | null = null;
 
 const responseSchema = {
