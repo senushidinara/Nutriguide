@@ -1,13 +1,19 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import { UserProfile, FoodItem, SimulationResult } from "../types";
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;
 
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable is not set.");
-}
+let ai: GoogleGenAI | null = null;
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const getAI = () => {
+  if (!ai) {
+    if (!API_KEY) {
+      throw new Error("GEMINI_API_KEY environment variable is not set. Please configure your API key.");
+    }
+    ai = new GoogleGenAI({ apiKey: API_KEY });
+  }
+  return ai;
+};
 let chatSession: Chat | null = null;
 
 const responseSchema = {
@@ -92,7 +98,7 @@ export const getMealSimulation = async (userProfile: UserProfile, meal: FoodItem
 
     const systemInstruction = "You are NutriGuide, a personalized, predictive, multi-dimensional energy management AI. Your purpose is to simulate how meals affect a user's energy. You must provide detailed, actionable, and scientifically-plausible insights. Always respond with a valid JSON object matching the specified schema, with no additional text or markdown formatting.";
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
         model: model,
         contents: prompt,
         config: {
@@ -144,7 +150,7 @@ export const startChatSession = (userProfile: UserProfile, meal: FoodItem[], sim
         }
     ];
     
-    chatSession = ai.chats.create({
+    chatSession = getAI().chats.create({
         model: 'gemini-2.5-flash',
         config: { systemInstruction },
         history: initialHistory,
