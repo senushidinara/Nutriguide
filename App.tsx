@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { UserProfile, AppView, ThemeName } from './types';
 import UserProfileSetup from './components/UserProfileSetup';
@@ -44,9 +45,22 @@ const App: React.FC = () => {
   useEffect(() => {
     const activeTheme = themes[theme];
     const root = document.documentElement;
-    for (const [key, value] of Object.entries(activeTheme)) {
+    
+    // Apply colors
+    for (const [key, value] of Object.entries(activeTheme.colors)) {
+        // FIX: Cast value to string to satisfy setProperty's type requirement.
         root.style.setProperty(key, value as string);
     }
+
+    // Apply fonts
+    for (const [key, value] of Object.entries(activeTheme.fonts)) {
+        // FIX: Cast value to string to satisfy setProperty's type requirement.
+        root.style.setProperty(key, value as string);
+    }
+    
+    // Apply background
+    root.style.setProperty('--background-gradient', activeTheme.background);
+
     localStorage.setItem('nutriGuideTheme', theme);
   }, [theme]);
   
@@ -73,19 +87,20 @@ const App: React.FC = () => {
   };
 
   const renderContent = () => {
+    const currentFont = themes[theme].fonts['--font-family-sans'].includes('Lora') ? 'font-serif' : 'font-sans';
     switch (activeView) {
       case 'dashboard':
-        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowToast={showToast} />;
+        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowToast={showToast} currentFont={currentFont} />;
       case 'simulator':
-        return <MealSimulator userProfile={userProfile!} />;
+        return <MealSimulator userProfile={userProfile!} currentFont={currentFont}/>;
       case 'genetics':
-        return <GeneticsMicrobiome onShowToast={showToast}/>;
+        return <GeneticsMicrobiome onShowToast={showToast} currentFont={currentFont}/>;
        case 'community':
-        return <Community />;
+        return <Community currentFont={currentFont}/>;
       case 'settings':
-        return <Settings userProfile={userProfile!} onProfileUpdate={handleProfileSubmit} theme={theme} onThemeChange={setTheme} onShowToast={showToast}/>;
+        return <Settings userProfile={userProfile!} onProfileUpdate={handleProfileSubmit} theme={theme} onThemeChange={setTheme} onShowToast={showToast} currentFont={currentFont} />;
       default:
-        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowToast={showToast} />;
+        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowToast={showToast} currentFont={currentFont}/>;
     }
   };
 
@@ -99,7 +114,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen w-full font-sans antialiased relative">
+    <div className="min-h-screen w-full antialiased relative">
        {isDisclaimerOpen && <DisclaimerModal onClose={handleDisclaimerAccept} />}
        <Layout activeView={activeView} setActiveView={setActiveView}>
          {renderContent()}

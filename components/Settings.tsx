@@ -10,15 +10,16 @@ interface SettingsProps {
     theme: ThemeName;
     onThemeChange: (theme: ThemeName) => void;
     onShowToast: (message: string) => void;
+    currentFont: 'font-sans' | 'font-serif';
 }
 
-const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme, onThemeChange, onShowToast }) => {
+const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme, onThemeChange, onShowToast, currentFont }) => {
     const [isProfileModalOpen, setProfileModalOpen] = useState(false);
 
     return (
         <div className="animate-fade-in space-y-8">
             <header>
-                <h1 className="text-4xl font-bold text-secondary">Settings</h1>
+                <h1 className={`text-4xl font-bold text-secondary ${currentFont}`}>Settings</h1>
                 <p className="text-text-secondary mt-1">Manage your profile, integrations, and preferences.</p>
             </header>
             
@@ -33,25 +34,39 @@ const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme
                 </SettingsSection>
 
                 <SettingsSection title="Appearance">
-                    <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="p-4 grid grid-cols-2 md:grid-cols-3 gap-4">
                         {(Object.keys(themes) as ThemeName[]).map((themeKey) => {
-                        const isActive = theme === themeKey;
-                        const themeColors = themes[themeKey];
-                        const primaryColor = `rgb(${themeColors['--color-primary']})`;
-
-                        return (
-                            <button
-                            key={themeKey}
-                            onClick={() => onThemeChange(themeKey)}
-                            className={`p-2 rounded-lg border-2 transition-all ${isActive ? 'border-primary ring-2 ring-primary/50' : 'border-transparent hover:border-border-color'}`}
-                            aria-label={`Select ${themeKey} theme`}
-                            >
-                            <div className="w-full h-12 rounded-md mb-2 transition-transform transform hover:scale-105" style={{ backgroundColor: primaryColor }}></div>
-                            <p className={`text-sm font-semibold capitalize ${isActive ? 'text-primary' : 'text-text-secondary'}`}>
-                                {themeKey}
-                            </p>
-                            </button>
-                        );
+                            const isActive = theme === themeKey;
+                            const themeDetails = themes[themeKey];
+                            
+                            return (
+                                <button
+                                    key={themeKey}
+                                    onClick={() => onThemeChange(themeKey)}
+                                    className={`relative p-2 rounded-lg border-2 transition-all ${isActive ? 'border-primary ring-2 ring-primary/50' : 'border-border-color hover:border-primary/50'}`}
+                                    aria-label={`Select ${themeKey} theme`}
+                                >
+                                    <div className="w-full h-16 rounded-md mb-2 overflow-hidden" >
+                                       <div className="w-full h-full" style={{ background: themeDetails.background }}></div>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <p className={`text-sm font-semibold capitalize ${isActive ? 'text-primary' : 'text-text-secondary'}`}>
+                                            {themeKey}
+                                        </p>
+                                        <div 
+                                            className="w-4 h-4 rounded-full" 
+                                            style={{ backgroundColor: `rgb(${themeDetails.colors['--color-primary']})`}}
+                                        ></div>
+                                    </div>
+                                    <div 
+                                        className="absolute top-4 left-4 right-4 text-xs font-bold text-white/80 p-1 rounded bg-black/20 backdrop-blur-sm"
+                                        style={{ fontFamily: themeDetails.fonts['--font-family-sans']}}
+                                    >
+                                        <span style={{ fontFamily: themeDetails.fonts['--font-family-serif']}}>Ag</span>
+                                        <span> Abc</span>
+                                    </div>
+                                </button>
+                            );
                         })}
                     </div>
                 </SettingsSection>
@@ -107,7 +122,7 @@ const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme
 const SettingsSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
     <div>
         <h2 className="text-xl font-bold text-secondary mb-3">{title}</h2>
-        <div className="bg-surface rounded-2xl border border-border-color shadow-lg shadow-slate-200/50 overflow-hidden divide-y divide-border-color">
+        <div className="bg-surface rounded-2xl border border-border-color shadow-lg shadow-slate-200/50 overflow-hidden">
             {children}
         </div>
     </div>

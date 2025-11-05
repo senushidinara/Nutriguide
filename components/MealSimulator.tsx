@@ -13,9 +13,10 @@ import { ServerCrash, ArrowLeft } from './icons';
 
 interface MealSimulatorProps {
   userProfile: UserProfile;
+  currentFont: 'font-sans' | 'font-serif';
 }
 
-const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfile }) => {
+const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfile, currentFont }) => {
   const [userProfile, setUserProfile] = useState<UserProfile>(initialProfile);
   const [currentMeal, setCurrentMeal] = useState<FoodItem[]>([]);
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
@@ -175,7 +176,7 @@ const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfi
   return (
     <main className="min-h-[calc(100vh-150px)] w-full flex flex-col items-center justify-center">
         <header className="w-full mb-8">
-            <h1 className="text-4xl font-bold text-secondary">Meal Simulator</h1>
+            <h1 className={`text-4xl font-bold text-secondary ${currentFont}`}>Meal Simulator</h1>
             <p className="text-text-secondary mt-1">Compose a meal and predict its impact on your body.</p>
         </header>
         <div className="w-full flex-grow flex items-center justify-center">

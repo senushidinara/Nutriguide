@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
         --color-background: 248 250 252;
@@ -21,16 +21,27 @@
         --color-text-secondary: 71 85 105;
         --color-text-muted: 148 163 184;
         --color-border-color: 226 232 240;
+
+        --font-family-sans: 'Manrope', sans-serif;
+        --font-family-serif: 'Lora', serif;
+
+        --background-gradient: linear-gradient(135deg, rgb(var(--color-background)) 0%, rgba(var(--color-primary), 0.03) 100%);
       }
       body {
+        font-family: var(--font-family-sans);
         background-color: rgb(var(--color-background));
-        background: linear-gradient(135deg, rgb(var(--color-background)) 0%, rgba(var(--color-primary), 0.03) 100%);
+        background: var(--background-gradient);
         background-size: 400% 400%;
-        animation: backgroundPan 15s ease-in-out infinite;
-        transition: background-color 0.5s ease;
+        animation: backgroundPan 15s ease-in-out infinite alternate;
+        transition: background 0.5s ease;
       }
       * {
-        transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
+        transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, fill 0.3s ease, stroke 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      @keyframes backgroundPan {
+        from { background-position: 0% 50%; }
+        to { background-position: 100% 50%; }
       }
     </style>
     <script>
@@ -39,6 +50,7 @@
           extend: {
             fontFamily: {
               sans: ['Manrope', 'sans-serif'],
+              serif: ['Lora', 'serif'],
             },
             colors: {
               'background': 'rgb(var(--color-background) / <alpha-value>)',
@@ -56,7 +68,6 @@
               'fade-in': 'fadeIn 0.5s ease-in-out forwards',
               'slide-in-up': 'slideInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
               'pulse-subtle': 'pulseSubtle 2.5s ease-in-out infinite',
-              'backgroundPan': 'backgroundPan 15s ease-in-out infinite alternate',
             },
             keyframes: {
               fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
@@ -68,10 +79,6 @@
                 '0%, 100%': { transform: 'scale(1)', opacity: 1 }, 
                 '50%': { transform: 'scale(1.02)', opacity: 0.98 } 
               },
-              backgroundPan: {
-                '0%': { background-position: '0% 50%' },
-                '100%': { background-position: '100% 50%' },
-              }
             }
           }
         }
@@ -89,7 +96,7 @@
 }
 </script>
 </head>
-  <body class="text-text-primary">
+  <body>
     <div id="root"></div>
   </body>
 </html>

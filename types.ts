@@ -1,5 +1,5 @@
 export type AppView = 'dashboard' | 'simulator' | 'genetics' | 'community' | 'settings';
-export type ThemeName = 'emerald' | 'sapphire' | 'ruby' | 'amethyst';
+export type ThemeName = 'emerald' | 'sapphire' | 'ruby' | 'amethyst' | 'solaris' | 'nocturne';
 
 export interface UserProfile {
   age: number;

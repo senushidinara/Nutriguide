@@ -1,6 +1,10 @@
 import React from 'react';
 import { Trophy, Shield, Zap, CalendarClock } from './icons';
 
+interface CommunityProps {
+    currentFont: 'font-sans' | 'font-serif';
+}
+
 const achievements = [
     { icon: Zap, title: "Simulation Pioneer", description: "Run your first 10 meal simulations.", progress: 10, goal: 10 },
     { icon: Trophy, title: "Wellness Warrior", description: "Achieve a wellness score of 90+.", progress: 1, goal: 1 },
@@ -15,16 +19,16 @@ const leaderboard = [
     { rank: 4, name: "Carlos R.", score: 2050, avatar: 'C' },
 ];
 
-const Community: React.FC = () => {
+const Community: React.FC<CommunityProps> = ({ currentFont }) => {
     return (
         <div className="animate-fade-in space-y-8">
             <header>
-                <h1 className="text-4xl font-bold text-secondary">Community & Achievements</h1>
+                <h1 className={`text-4xl font-bold text-secondary ${currentFont}`}>Community & Achievements</h1>
                 <p className="text-text-secondary mt-1">Stay motivated, track your progress, and see how you stack up.</p>
             </header>
 
             <div>
-                <h2 className="text-2xl font-bold text-secondary mb-4">My Achievements</h2>
+                <h2 className={`text-2xl font-bold text-secondary mb-4 ${currentFont}`}>My Achievements</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {achievements.map((ach, index) => (
                         <AchievementCard key={index} {...ach} />
@@ -33,7 +37,7 @@ const Community: React.FC = () => {
             </div>
 
             <div>
-                <h2 className="text-2xl font-bold text-secondary mb-4">Weekly Leaderboard</h2>
+                <h2 className={`text-2xl font-bold text-secondary mb-4 ${currentFont}`}>Weekly Leaderboard</h2>
                 <div className="bg-surface rounded-2xl p-6 border border-border-color shadow-lg shadow-slate-200/50">
                     <ul className="space-y-3">
                         {leaderboard.map((user) => (
@@ -74,7 +78,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ icon: Icon, title, de
                     <span className="font-medium text-text-secondary">Progress</span>
                     <span className="font-bold text-primary">{progress} / {goal}</span>
                 </div>
-                <div className="w-full h-2.5 bg-slate-100 rounded-full">
+                <div className="w-full h-2.5 bg-background rounded-full">
                     <div className="bg-primary h-2.5 rounded-full" style={{ width: `${progressPercent}%`}}></div>
                 </div>
             </div>

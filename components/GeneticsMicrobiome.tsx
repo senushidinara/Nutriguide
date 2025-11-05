@@ -3,13 +3,14 @@ import { Dna, Beaker, Zap, Shield } from './icons';
 
 interface GeneticsMicrobiomeProps {
     onShowToast: (message: string) => void;
+    currentFont: 'font-sans' | 'font-serif';
 }
 
-const GeneticsMicrobiome: React.FC<GeneticsMicrobiomeProps> = ({ onShowToast }) => {
+const GeneticsMicrobiome: React.FC<GeneticsMicrobiomeProps> = ({ onShowToast, currentFont }) => {
     return (
         <div className="animate-fade-in space-y-8">
             <header>
-                <h1 className="text-4xl font-bold text-secondary">Hyper-Personalization</h1>
+                <h1 className={`text-4xl font-bold text-secondary ${currentFont}`}>Hyper-Personalization</h1>
                 <p className="text-text-secondary mt-1 max-w-2xl">Connect your genetic and microbiome data to unlock the next level of predictive accuracy and personalized insights.</p>
             </header>
 
@@ -20,6 +21,7 @@ const GeneticsMicrobiome: React.FC<GeneticsMicrobiomeProps> = ({ onShowToast }) 
                     description="Integrate your genetic markers to understand predispositions related to metabolism, nutrient processing, and food sensitivities. This allows for truly preventative recommendations."
                     status="not_connected"
                     onConnect={() => onShowToast('Genetic data integration is coming soon!')}
+                    currentFont={currentFont}
                 />
                 <DataCard
                     icon={Beaker}
@@ -27,11 +29,12 @@ const GeneticsMicrobiome: React.FC<GeneticsMicrobiomeProps> = ({ onShowToast }) 
                     description="Connect your gut microbiome data to fine-tune predictions based on how your unique gut bacteria impact digestion, inflammation, and even mood."
                     status="not_connected"
                     onConnect={() => onShowToast('Microbiome analysis is coming soon!')}
+                    currentFont={currentFont}
                 />
             </div>
 
             <div className="bg-surface p-8 rounded-2xl border border-border-color shadow-lg shadow-slate-200/50">
-                <h3 className="text-xl font-bold text-secondary mb-4">The Future of Nutrition</h3>
+                <h3 className={`text-xl font-bold text-secondary mb-4 ${currentFont}`}>The Future of Nutrition</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-text-secondary">
                     <p>By combining your Body Blueprint with genetic and microbiome data, NutriGuide transitions from a powerful simulator into a predictive health guardian. This holistic view enables us to:</p>
                     <ul className="space-y-3">
@@ -54,15 +57,16 @@ interface DataCardProps {
     description: string;
     status: 'connected' | 'not_connected' | 'pending';
     onConnect: () => void;
+    currentFont: string;
 }
 
-const DataCard: React.FC<DataCardProps> = ({ icon: Icon, title, description, status, onConnect }) => (
+const DataCard: React.FC<DataCardProps> = ({ icon: Icon, title, description, status, onConnect, currentFont }) => (
     <div className="bg-surface p-6 rounded-2xl border border-border-color shadow-lg shadow-slate-200/50 flex flex-col transition-transform transform hover:-translate-y-1">
         <div className="flex items-center gap-4 mb-3">
             <div className="w-12 h-12 bg-accent/50 rounded-lg flex items-center justify-center">
                 <Icon className="w-7 h-7 text-primary" />
             </div>
-            <h2 className="text-xl font-bold text-secondary">{title}</h2>
+            <h2 className={`text-xl font-bold text-secondary ${currentFont}`}>{title}</h2>
         </div>
         <p className="text-text-secondary flex-grow mt-2">{description}</p>
         <button 
