@@ -169,7 +169,8 @@ const SettingsItem: React.FC<{ icon: React.FC<{className?:string}>; title: strin
                 <p className="text-sm text-text-secondary">{description}</p>
             </div>
             <div className="ml-4">
-                 <svg className="w-5 h-5 text-text-muted transition-transform transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                 {/* FIX: Corrected typo in viewBox attribute. */}
+                 <svg className="w-5 h-5 text-text-muted transition-transform transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
         </button>
     );

@@ -16,6 +16,8 @@ const UserProfileSetup: React.FC<UserProfileSetupProps> = ({ onSubmit }) => {
     geneticsDataStatus: 'not_connected',
     microbiomeDataStatus: 'not_connected',
     wearableStatus: 'not_connected',
+    lastWellnessScore: null,
+    lastMacros: { protein: 0, carbs: 0, fats: 0 },
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { UserProfile, AppView, ThemeName, Achievement, LeaderboardUser, SimulationResult, Toast, AppState } from './types';
 import UserProfileSetup from './components/UserProfileSetup';
@@ -111,16 +112,8 @@ const App: React.FC = () => {
     root.style.setProperty('--background-gradient', activeTheme.background);
   }, [appState.theme]);
   
-  const handleProfileSubmit = (profile: Omit<UserProfile, 'geneticsDataStatus' | 'microbiomeDataStatus' | 'wearableStatus' | 'lastWellnessScore' | 'lastMacros'>) => {
-    const fullProfile: UserProfile = {
-        ...profile,
-        geneticsDataStatus: 'not_connected',
-        microbiomeDataStatus: 'not_connected',
-        wearableStatus: 'not_connected',
-        lastWellnessScore: null,
-        lastMacros: { protein: 0, carbs: 0, fats: 0 }
-    };
-    updateState('userProfile', fullProfile);
+  const handleProfileSubmit = (profile: UserProfile) => {
+    updateState('userProfile', profile);
   };
 
   const handleDisclaimerAccept = () => {
