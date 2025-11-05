@@ -1,8 +1,7 @@
-
 # 🌟 NutriGuide AI: Your Predictive Wellness Co-pilot 🌟
 
 <p align="center">
-  <img src="https://storage.googleapis.com/maker-me/prompt-images/a%20vibrant%20promotional%20banner%20for%20a%20futuristic%20AI-powered%20nutrition%20app%20called%20'NutriGuide%20AI'.%20The%20banner%20should%20feature%20a%20sleek%20smartphone%20displaying%20the%20app's%20dashboard%2C%20with%20glowing%20charts%20and%20a%20'Wellness%20Score'%20of%2092.%20Surrounding%20the%20phone%20are%20holographic%20projections%20of%20healthy%20foods%20(like%20avocado%2C%20salmon%2C%20and%20blueberries)%20and%20glowing%20DNA%20strands%2C%20symbolizing%20personalization.%20The%20background%20should%20be%20a%20dark%2C%20sophisticated%20gradient%20with%20subtle%20network%20lines%2C%20and%20the%20text%20'NutriGuide%20AI'%20should%20be%20in%20a%20modern%2C%20elegant%20font.%20The%20overall%20mood%20is%20aspirational%2C%20scientific%2c%20and%20luxurious.1718223403.png" alt="NutriGuide AI Banner" width="800"/>
+  <img src="https://i.imgur.com/g4gP7k5.png" alt="NutriGuide AI Banner" width="800"/>
 </p>
 
 <p align="center">
@@ -202,9 +201,9 @@ NutriGuide AI was architected as a scalable, secure, and AI-native application f
 <details>
   <summary><strong>🎨 Frontend Magic</strong></summary>
 
-  *   **React & TypeScript:** ❤️ The foundation of our modern, type-safe, and beautiful user interface.
-  *   **Tailwind CSS:** 💨 For rapid, utility-first styling that allowed us to build and iterate on our UI with incredible speed.
-  *   **Recharts:** 📊 Used to create the stunning, animated charts for the simulation results and wellness dashboard.
+  *   **⚛️ React & TypeScript:** ❤️ The foundation of our modern, type-safe, and beautiful user interface.
+  *   **🍃 Tailwind CSS:** 💨 For rapid, utility-first styling that allowed us to build and iterate on our UI with incredible speed.
+  *   **📊 Recharts:** 📈 Used to create the stunning, animated charts for the simulation results and wellness dashboard.
 </details>
 
 ---
@@ -213,7 +212,7 @@ NutriGuide AI was architected as a scalable, secure, and AI-native application f
 
 This project is a modern web application built with React and Vite.
 
-1.  **Clone the repository:** `git clone https://github.com/nutriguide/nutriguide-ai.git`
+1.  **Clone the repository.**
 2.  **Install dependencies:** `npm install`
 3.  **Set up environment variables:** Create a `.env` file and add your `API_KEY`.
 4.  **Run the development server:** `npm run dev`
