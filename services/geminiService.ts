@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type, Chat } from "@google/genai";
+import { GoogleGenAI, Type, Chat } from "@google/ai";
 import { UserProfile, FoodItem, SimulationResult, GroundingSource } from "../types";
 
 const API_KEY = process.env.API_KEY;
@@ -162,11 +162,11 @@ export const startChatSession = (userProfile: UserProfile, meal: FoodItem[], sim
 };
 
 const getGroundedResponse = async (message: string, location: {latitude: number, longitude: number} | null) => {
-    const tools = [{googleSearch: {}}];
+    // FIX: Conditionally construct the tools array to ensure type safety, preventing an error when adding googleMaps.
+    const tools = location ? [{googleSearch: {}}, {googleMaps: {}}] : [{googleSearch: {}}];
     let toolConfig;
 
     if (location) {
-        tools.push({googleMaps: {}});
         toolConfig = {
             retrievalConfig: {
                 latLng: {
