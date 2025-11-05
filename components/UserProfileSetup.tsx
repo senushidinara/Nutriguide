@@ -6,12 +6,16 @@ interface UserProfileSetupProps {
 }
 
 const UserProfileSetup: React.FC<UserProfileSetupProps> = ({ onSubmit }) => {
+  // FIX: Initialize UserProfile with all required fields to match the type definition.
   const [profile, setProfile] = useState<UserProfile>({
     age: 30,
     weight: 70,
     height: 175,
     activityLevel: 'moderate',
     goal: 'maintain_weight',
+    geneticsDataStatus: 'not_connected',
+    microbiomeDataStatus: 'not_connected',
+    wearableStatus: 'not_connected',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

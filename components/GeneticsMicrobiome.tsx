@@ -1,14 +1,15 @@
+
 import React, { useState } from 'react';
 import { Dna, Beaker, Zap, Shield, Loader, CheckCircle } from './icons';
 import { UserProfile } from '../types';
 
 interface GeneticsMicrobiomeProps {
     userProfile: UserProfile;
-    onUpdateStatus: (type: 'geneticsDataStatus' | 'microbiomeDataStatus', status: 'not_connected' | 'pending' | 'connected') => void;
+    onConnect: (type: 'genetics' | 'microbiome') => void;
     currentFont: 'font-sans' | 'font-serif';
 }
 
-const GeneticsMicrobiome: React.FC<GeneticsMicrobiomeProps> = ({ userProfile, onUpdateStatus, currentFont }) => {
+const GeneticsMicrobiome: React.FC<GeneticsMicrobiomeProps> = ({ userProfile, onConnect, currentFont }) => {
     return (
         <div className="animate-fade-in space-y-8">
             <header>
@@ -21,22 +22,16 @@ const GeneticsMicrobiome: React.FC<GeneticsMicrobiomeProps> = ({ userProfile, on
                     icon={Dna}
                     title="Genetic Blueprint"
                     description="Integrate your genetic markers to understand predispositions related to metabolism, nutrient processing, and food sensitivities. This allows for truly preventative recommendations."
-                    status={userProfile.geneticsDataStatus || 'not_connected'}
-                    onConnect={() => {
-                        onUpdateStatus('geneticsDataStatus', 'pending');
-                        setTimeout(() => onUpdateStatus('geneticsDataStatus', 'connected'), 2000);
-                    }}
+                    status={userProfile.geneticsDataStatus}
+                    onConnect={() => onConnect('genetics')}
                     currentFont={currentFont}
                 />
                 <DataCard
                     icon={Beaker}
                     title="Microbiome Analysis"
                     description="Connect your gut microbiome data to fine-tune predictions based on how your unique gut bacteria impact digestion, inflammation, and even mood."
-                    status={userProfile.microbiomeDataStatus || 'not_connected'}
-                    onConnect={() => {
-                        onUpdateStatus('microbiomeDataStatus', 'pending');
-                        setTimeout(() => onUpdateStatus('microbiomeDataStatus', 'connected'), 2000);
-                    }}
+                    status={userProfile.microbiomeDataStatus}
+                    onConnect={() => onConnect('microbiome')}
                     currentFont={currentFont}
                 />
             </div>
@@ -70,17 +65,6 @@ interface DataCardProps {
 
 const DataCard: React.FC<DataCardProps> = ({ icon: Icon, title, description, status, onConnect, currentFont }) => {
     
-    const getButtonContent = () => {
-        switch (status) {
-            case 'pending':
-                return <><Loader className="w-5 h-5 animate-spin"/> Connecting...</>;
-            case 'connected':
-                return <><CheckCircle className="w-5 h-5"/> Connected</>;
-            default:
-                return 'Connect Data';
-        }
-    }
-
     return (
         <div className="bg-surface p-6 rounded-2xl border border-border-color shadow-lg shadow-slate-200/50 flex flex-col transition-transform transform hover:-translate-y-1">
             <div className="flex items-center gap-4 mb-3">
@@ -90,15 +74,18 @@ const DataCard: React.FC<DataCardProps> = ({ icon: Icon, title, description, sta
                 <h2 className={`text-xl font-bold text-secondary ${currentFont}`}>{title}</h2>
             </div>
             <p className="text-text-secondary flex-grow mt-2">{description}</p>
-            <button 
-                onClick={onConnect}
-                disabled={status !== 'not_connected'}
-                className="mt-6 w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-all focus:outline-none focus:ring-4 focus:ring-primary/50 disabled:cursor-not-allowed
-                           enabled:bg-primary enabled:hover:bg-primary-hover enabled:text-white enabled:transform enabled:hover:scale-105
-                           disabled:bg-slate-200 disabled:text-text-muted"
-            >
-                {getButtonContent()}
-            </button>
+             {status === 'connected' ? (
+                <div className="mt-6 w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg bg-green-100 text-green-800 border border-green-200">
+                    <CheckCircle className="w-5 h-5"/> Connected
+                </div>
+            ) : (
+                <button 
+                    onClick={onConnect}
+                    className="mt-6 w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-all focus:outline-none focus:ring-4 focus:ring-primary/50 bg-primary hover:bg-primary-hover text-white transform hover:scale-105"
+                >
+                    Connect Data
+                </button>
+            )}
         </div>
     );
 };

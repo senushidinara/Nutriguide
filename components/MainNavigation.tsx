@@ -49,7 +49,8 @@ const MainNavigation: React.FC<MainNavigationProps> = ({ activeView, setActiveVi
                     return (
                         <button
                             key={item.id}
-                            ref={el => itemRefs.current[index] = el}
+                            // FIX: Ensure the ref callback function does not return a value.
+                            ref={el => { itemRefs.current[index] = el; }}
                             onClick={() => setActiveView(item.id)}
                             className={`group flex flex-col items-center justify-center gap-1 w-16 h-16 rounded-full transition-colors duration-300 transform relative focus:outline-none ${isActive ? 'text-white' : 'text-text-secondary hover:text-primary'}`}
                             aria-current={isActive ? 'page' : undefined}

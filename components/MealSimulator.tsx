@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { UserProfile, FoodItem, SimulationResult, ChatMessage, SavedMeal, GroundingSource } from '../types';
 import FoodSelector from './FoodSelector';

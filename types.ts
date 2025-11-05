@@ -1,3 +1,5 @@
+import type { FC } from 'react';
+
 export type AppView = 'dashboard' | 'simulator' | 'genetics' | 'community' | 'settings';
 export type ThemeName = 'emerald' | 'sapphire' | 'ruby' | 'amethyst' | 'solaris' | 'nocturne';
 
@@ -7,9 +9,9 @@ export interface UserProfile {
   height: number;
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   goal: 'lose_weight' | 'maintain_weight' | 'gain_muscle';
-  geneticsDataStatus?: 'not_connected' | 'pending' | 'connected';
-  microbiomeDataStatus?: 'not_connected' | 'pending' | 'connected';
-  wearableStatus?: 'not_connected' | 'pending' | 'connected';
+  geneticsDataStatus: 'not_connected' | 'pending' | 'connected';
+  microbiomeDataStatus: 'not_connected' | 'pending' | 'connected';
+  wearableStatus: 'not_connected' | 'pending' | 'connected';
 }
 
 export interface FoodItem {
@@ -81,4 +83,22 @@ export interface SavedMeal {
     id: string;
     name: string;
     foods: FoodItem[];
+}
+
+export interface Achievement {
+    icon: FC<{className?: string}>;
+    title: string;
+    description: string;
+    progress: number;
+    goal: number;
+    reward: string;
+}
+
+export interface LeaderboardUser {
+    rank: number;
+    name: string;
+    score: number;
+    avatar: string;
+    trend: 'up' | 'down' | 'stable';
+    lastMealScore: number;
 }

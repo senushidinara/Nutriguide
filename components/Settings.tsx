@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { UserProfile, ThemeName } from '../types';
 import UserProfileModal from './UserProfileModal';
-import { UserIcon, Shield, Zap, AlertTriangle, Dna, FileText, Loader, CheckCircle } from './icons';
+import { UserIcon, Shield, Zap, AlertTriangle, Dna, FileText } from './icons';
 import { themes } from '../themes';
 
 interface SettingsProps {
@@ -10,18 +11,14 @@ interface SettingsProps {
     theme: ThemeName;
     onThemeChange: (theme: ThemeName) => void;
     onShowInfo: (title: string, content: React.ReactNode) => void;
-    onUpdateStatus: (type: 'wearableStatus', status: 'not_connected' | 'pending' | 'connected') => void;
+    onManageData: () => void;
+    onConnectWearables: () => void;
     currentFont: 'font-sans' | 'font-serif';
 }
 
-const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme, onThemeChange, onShowInfo, onUpdateStatus, currentFont }) => {
+const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme, onThemeChange, onShowInfo, onManageData, onConnectWearables, currentFont }) => {
     const [isProfileModalOpen, setProfileModalOpen] = useState(false);
     
-    const handleConnectWearables = () => {
-        onUpdateStatus('wearableStatus', 'pending');
-        setTimeout(() => onUpdateStatus('wearableStatus', 'connected'), 2000);
-    };
-
     const legalContent = {
         terms: (
             <div className="space-y-4 text-sm text-text-secondary">
@@ -101,19 +98,17 @@ const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme
                 </SettingsSection>
 
                 <SettingsSection title="Integrations">
-                    <SettingsItem
+                     <SettingsItem
                         icon={Zap}
                         title="Connect Wearables"
-                        description="Sync data from Apple Health, Google Fit, and more."
-                        onClick={handleConnectWearables}
-                        status={userProfile.wearableStatus || 'not_connected'}
+                        description={userProfile.wearableStatus === 'connected' ? 'Manage your connected wearables' : 'Sync data from Apple Health, Google Fit, etc.'}
+                        onClick={userProfile.wearableStatus === 'connected' ? onManageData : onConnectWearables}
                     />
                     <SettingsItem
                         icon={Dna}
                         title="Manage Genetic Data"
-                        description="Connect or disconnect your genetics information."
-                        onClick={() => {}}
-                        status={userProfile.geneticsDataStatus || 'not_connected'}
+                        description="View or disconnect your genetics information."
+                        onClick={onManageData}
                     />
                 </SettingsSection>
 
@@ -159,24 +154,9 @@ const SettingsSection: React.FC<{ title: string; children: React.ReactNode }> = 
     </div>
 );
 
-const SettingsItem: React.FC<{ icon: React.FC<{className?:string}>; title: string; description: string; onClick: () => void, status?: string }> = ({ icon: Icon, title, description, onClick, status }) => {
-    
-    const renderStatus = () => {
-        if (!status) {
-            return <svg className="w-5 h-5 text-text-muted transition-transform transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>;
-        }
-        switch (status) {
-            case 'pending':
-                return <Loader className="w-5 h-5 text-primary animate-spin" />;
-            case 'connected':
-                return <span className="text-sm font-bold text-primary flex items-center gap-1"><CheckCircle className="w-5 h-5"/> Connected</span>;
-            default:
-                 return <span className="text-sm font-bold text-text-secondary">Connect</span>;
-        }
-    };
-
+const SettingsItem: React.FC<{ icon: React.FC<{className?:string}>; title: string; description: string; onClick: () => void }> = ({ icon: Icon, title, description, onClick }) => {
     return (
-        <button onClick={onClick} disabled={status === 'pending' || status === 'connected'} className="flex items-center w-full text-left p-4 hover:bg-background transition-colors group disabled:pointer-events-none">
+        <button onClick={onClick} className="flex items-center w-full text-left p-4 hover:bg-background transition-colors group">
             <div className="w-10 h-10 bg-accent/50 rounded-lg flex items-center justify-center mr-4">
                 <Icon className="w-6 h-6 text-primary" />
             </div>
@@ -185,7 +165,7 @@ const SettingsItem: React.FC<{ icon: React.FC<{className?:string}>; title: strin
                 <p className="text-sm text-text-secondary">{description}</p>
             </div>
             <div className="ml-4">
-                 {renderStatus()}
+                 <svg className="w-5 h-5 text-text-muted transition-transform transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
         </button>
     );

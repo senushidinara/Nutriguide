@@ -1,6 +1,7 @@
 import React from 'react';
-import { BarChart, Smile, Zap, X } from './icons';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Bar, Cell } from 'recharts';
+// FIX: Import BarChart from 'recharts' instead of './icons' to resolve a component prop type mismatch. The 'BarChart' from './icons' was an SVG icon, not the chart component.
+import { Smile, Zap, X } from './icons';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Bar, Cell, BarChart } from 'recharts';
 
 const weeklyData = [
   { day: 'Mon', score: 75 },

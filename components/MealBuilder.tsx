@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { FoodItem, SavedMeal } from '../types';
 import { X, Trash2, Zap, UserIcon, HistoryIcon } from './icons';
@@ -28,6 +29,13 @@ const MealBuilder: React.FC<MealBuilderProps> = ({ currentMeal, removeFoodFromMe
         <div className="flex items-center justify-between p-4 border-b border-border-color flex-shrink-0">
             <h2 className="text-xl font-bold text-secondary">Simulation Core</h2>
             <div className="flex items-center gap-2">
+                <button
+                onClick={onOpenProfile}
+                className="p-2 rounded-full hover:bg-background transition-colors"
+                aria-label="Open Body Blueprint"
+                >
+                <UserIcon className="w-6 h-6 text-text-muted" />
+                </button>
                 <button
                 onClick={() => setHistoryOpen(true)}
                 className="p-2 rounded-full hover:bg-background transition-colors"

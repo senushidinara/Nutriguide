@@ -1,7 +1,5 @@
-
-
 import React, { useState, useCallback, useEffect } from 'react';
-import { UserProfile, AppView, ThemeName } from './types';
+import { UserProfile, AppView, ThemeName, Achievement, LeaderboardUser } from './types';
 import UserProfileSetup from './components/UserProfileSetup';
 import Layout from './components/Layout';
 import WellnessDashboard from './components/WellnessDashboard';
@@ -12,8 +10,11 @@ import Settings from './components/Settings';
 import DisclaimerModal from './components/DisclaimerModal';
 import WeeklyReportModal from './components/WeeklyReportModal';
 import InfoModal from './components/InfoModal';
+import ConnectionModal from './components/ConnectionModal';
+import AchievementDetailModal from './components/AchievementDetailModal';
+import CommunityProfileModal from './components/CommunityProfileModal';
+import DataManagementModal from './components/DataManagementModal';
 import { themes } from './themes';
-import { Zap } from './components/icons';
 import { getChatResponse } from './services/geminiService';
 
 
@@ -21,7 +22,14 @@ const App: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
     try {
       const savedProfile = localStorage.getItem('nutriGuideProfile');
-      return savedProfile ? JSON.parse(savedProfile) : null;
+      const profile = savedProfile ? JSON.parse(savedProfile) : null;
+      // Ensure all connection statuses are present
+      if (profile) {
+        profile.geneticsDataStatus = profile.geneticsDataStatus || 'not_connected';
+        profile.microbiomeDataStatus = profile.microbiomeDataStatus || 'not_connected';
+        profile.wearableStatus = profile.wearableStatus || 'not_connected';
+      }
+      return profile;
     } catch (error) {
       return null;
     }
@@ -34,13 +42,17 @@ const App: React.FC = () => {
   
   const [isWeeklyReportOpen, setWeeklyReportOpen] = useState(false);
   const [infoModalContent, setInfoModalContent] = useState<{title: string, content: React.ReactNode} | null>(null);
+  
+  const [isConnectionModalOpen, setConnectionModalOpen] = useState<{isOpen: boolean, type: 'genetics' | 'microbiome' | 'wearables' | null}>({isOpen: false, type: null});
+  const [isDataManagementModalOpen, setDataManagementModalOpen] = useState(false);
+  const [achievementModalContent, setAchievementModalContent] = useState<Achievement | null>(null);
+  const [communityProfileModalContent, setCommunityProfileModalContent] = useState<LeaderboardUser | null>(null);
+
 
   const [theme, setTheme] = useState<ThemeName>(() => {
     const savedTheme = localStorage.getItem('nutriGuideTheme') as ThemeName;
     return savedTheme && themes[savedTheme] ? savedTheme : 'emerald';
   });
-  
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   
   const [userLocation, setUserLocation] = useState<{latitude: number, longitude: number} | null>(null);
 
@@ -70,13 +82,11 @@ const App: React.FC = () => {
     
     // Apply colors
     for (const [key, value] of Object.entries(activeTheme.colors)) {
-        // FIX: Cast value to string to satisfy setProperty's type requirement.
         root.style.setProperty(key, value as string);
     }
 
     // Apply fonts
     for (const [key, value] of Object.entries(activeTheme.fonts)) {
-        // FIX: Cast value to string to satisfy setProperty's type requirement.
         root.style.setProperty(key, value as string);
     }
     
@@ -86,27 +96,21 @@ const App: React.FC = () => {
     localStorage.setItem('nutriGuideTheme', theme);
   }, [theme]);
   
-   useEffect(() => {
-    if (toastMessage) {
-      const timer = setTimeout(() => {
-        setToastMessage(null);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [toastMessage]);
-
   const handleProfileSubmit = (profile: UserProfile) => {
-    setUserProfile(profile);
+    const fullProfile = {
+        ...userProfile,
+        ...profile,
+        geneticsDataStatus: userProfile?.geneticsDataStatus || 'not_connected',
+        microbiomeDataStatus: userProfile?.microbiomeDataStatus || 'not_connected',
+        wearableStatus: userProfile?.wearableStatus || 'not_connected'
+    };
+    setUserProfile(fullProfile);
   };
 
   const handleDisclaimerAccept = () => {
     localStorage.setItem('nutriGuideDisclaimerAccepted', 'true');
     setDisclaimerOpen(false);
   }
-  
-  const showToast = (message: string) => {
-    setToastMessage(message);
-  };
   
   const handleShowInfoModal = (title: string, content: React.ReactNode) => {
     setInfoModalContent({ title, content });
@@ -121,6 +125,17 @@ const App: React.FC = () => {
     }
   };
 
+  const handleOpenConnectionModal = (type: 'genetics' | 'microbiome' | 'wearables') => {
+    setConnectionModalOpen({ isOpen: true, type });
+  };
+  
+  const handleConnectionSuccess = (type: 'genetics' | 'microbiome' | 'wearables') => {
+    if (type === 'genetics') handleUpdateConnectionStatus('geneticsDataStatus', 'connected');
+    if (type === 'microbiome') handleUpdateConnectionStatus('microbiomeDataStatus', 'connected');
+    if (type === 'wearables') handleUpdateConnectionStatus('wearableStatus', 'connected');
+    setConnectionModalOpen({ isOpen: false, type: null });
+  };
+
   const renderContent = () => {
     const currentFont = themes[theme].fonts['--font-family-sans'].includes('Lora') ? 'font-serif' : 'font-sans';
     switch (activeView) {
@@ -131,11 +146,15 @@ const App: React.FC = () => {
       case 'genetics':
         return <GeneticsMicrobiome 
                     userProfile={userProfile!} 
-                    onUpdateStatus={handleUpdateConnectionStatus}
+                    onConnect={handleOpenConnectionModal}
                     currentFont={currentFont}
                 />;
        case 'community':
-        return <Community currentFont={currentFont}/>;
+        return <Community 
+                    currentFont={currentFont}
+                    onAchievementClick={setAchievementModalContent}
+                    onProfileClick={setCommunityProfileModalContent}
+                />;
       case 'settings':
         return <Settings 
                     userProfile={userProfile!} 
@@ -143,7 +162,8 @@ const App: React.FC = () => {
                     theme={theme} 
                     onThemeChange={setTheme} 
                     onShowInfo={handleShowInfoModal}
-                    onUpdateStatus={handleUpdateConnectionStatus}
+                    onManageData={() => setDataManagementModalOpen(true)}
+                    onConnectWearables={() => handleOpenConnectionModal('wearables')}
                     currentFont={currentFont} />;
       default:
         return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowReport={() => setWeeklyReportOpen(true)} currentFont={currentFont}/>;
@@ -165,14 +185,35 @@ const App: React.FC = () => {
        <Layout activeView={activeView} setActiveView={setActiveView}>
          {renderContent()}
        </Layout>
-       {toastMessage && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-secondary text-white py-3 px-6 rounded-full shadow-lg z-50 flex items-center gap-2 animate-slide-in-up">
-            <Zap className="w-5 h-5" />
-            <span>{toastMessage}</span>
-        </div>
-       )}
+       
        {isWeeklyReportOpen && <WeeklyReportModal onClose={() => setWeeklyReportOpen(false)} />}
        {infoModalContent && <InfoModal title={infoModalContent.title} onClose={() => setInfoModalContent(null)}>{infoModalContent.content}</InfoModal>}
+       {isConnectionModalOpen.isOpen && (
+            <ConnectionModal 
+                type={isConnectionModalOpen.type!}
+                onClose={() => setConnectionModalOpen({ isOpen: false, type: null })}
+                onSuccess={() => handleConnectionSuccess(isConnectionModalOpen.type!)}
+            />
+        )}
+        {isDataManagementModalOpen && (
+            <DataManagementModal
+                userProfile={userProfile}
+                onClose={() => setDataManagementModalOpen(false)}
+                onUpdateStatus={handleUpdateConnectionStatus}
+            />
+        )}
+        {achievementModalContent && (
+            <AchievementDetailModal
+                achievement={achievementModalContent}
+                onClose={() => setAchievementModalContent(null)}
+            />
+        )}
+        {communityProfileModalContent && (
+             <CommunityProfileModal
+                user={communityProfileModalContent}
+                onClose={() => setCommunityProfileModalContent(null)}
+            />
+        )}
     </div>
   );
 };
