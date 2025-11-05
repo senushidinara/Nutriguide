@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const useAnimatedValue = (endValue: number, duration = 1500) => {
     const [currentValue, setCurrentValue] = useState(0);
-    // FIX: Initialize useRef with null and update type to allow null to fix hook error.
     const frameRef = useRef<number | null>(null);
     
     useEffect(() => {

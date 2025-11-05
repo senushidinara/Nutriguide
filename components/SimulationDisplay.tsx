@@ -4,7 +4,7 @@ import EnergyChart from './EnergyChart';
 import BodyMap from './BodyMap';
 import AiInsights from './AiInsights';
 import AnimatedScore from './AnimatedScore';
-import { ChatIcon, SaveIcon } from './icons';
+import { ChatIcon, SaveIcon, AlertTriangle } from './icons';
 
 interface SimulationDisplayProps {
   result: SimulationResult;
@@ -19,18 +19,19 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ result, onOpenCha
     energy_optimization_score, 
     insights,
     meal_alchemy_suggestion,
-    metabolic_forecast_weekly
+    metabolic_forecast_weekly,
+    energy_crash_prediction,
   } = result;
 
-  const scoreColor = energy_optimization_score > 75 ? 'text-brand-accent' : energy_optimization_score > 50 ? 'text-yellow-400' : 'text-red-400';
+  const scoreColor = energy_optimization_score > 75 ? 'text-primary' : energy_optimization_score > 50 ? 'text-yellow-500' : 'text-red-500';
 
   return (
-    <div className="relative space-y-8">
+    <div className="relative space-y-8 animate-fade-in">
 
-      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+      <div className="absolute top-0 right-0 z-10 flex items-center gap-2">
          <button
             onClick={onSaveMeal}
-            className="flex items-center gap-2 bg-brand-surface/80 backdrop-blur-sm hover:bg-brand-bg text-brand-text font-bold py-2 px-4 rounded-full transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-brand-primary/50 border border-brand-primary/20"
+            className="flex items-center gap-2 bg-surface/80 backdrop-blur-sm hover:bg-background text-text-primary font-bold py-2 px-4 rounded-full transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary/50 border border-border-color"
             aria-label="Save meal"
           >
             <SaveIcon className="w-5 h-5" />
@@ -38,7 +39,7 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ result, onOpenCha
           </button>
         <button
           onClick={onOpenChat}
-          className="flex items-center gap-2 bg-brand-primary hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-brand-primary/50"
+          className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded-full transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary/50"
           aria-label="Chat about results"
         >
           <ChatIcon className="w-5 h-5" />
@@ -47,14 +48,13 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ result, onOpenCha
       </div>
 
 
-       <div className="relative overflow-hidden bg-brand-surface/70 backdrop-blur-xl rounded-2xl p-6 border border-brand-primary/20 animate-stagger opacity-0" style={{ animationFillMode: 'forwards' }}>
-        <div className="absolute inset-0 bg-[linear-gradient(110deg,theme(colors.brand.bg),50%,theme(colors.brand.surface),55%,theme(colors.brand.bg))] bg-[length:200%_100%] animate-background-pan opacity-50"></div>
+       <div className="relative overflow-hidden bg-surface rounded-2xl p-6 border border-border-color shadow-lg shadow-slate-200/50">
         <div className="relative z-10">
-          <h2 className="text-2xl font-bold text-brand-secondary mb-4">Simulation Overview</h2>
-          <div className="flex items-center justify-center md:justify-start gap-6 bg-brand-bg/80 p-6 rounded-xl">
-             <div className="relative flex items-center justify-center animate-glow">
+          <h2 className="text-2xl font-bold text-secondary mb-4">Simulation Overview</h2>
+          <div className="flex flex-col items-center md:flex-row md:items-center justify-center md:justify-start gap-6 bg-background p-6 rounded-xl border border-border-color">
+             <div className="relative flex items-center justify-center">
                 <svg className="w-32 h-32 transform -rotate-90">
-                  <circle cx="64" cy="64" r="54" stroke="currentColor" strokeWidth="10" className="text-brand-primary/20" fill="transparent" />
+                  <circle cx="64" cy="64" r="54" stroke="currentColor" strokeWidth="10" className="text-slate-200" fill="transparent" />
                   <circle
                     cx="64"
                     cy="64"
@@ -70,8 +70,8 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ result, onOpenCha
                   />
                   <defs>
                       <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#00F5D4" />
-                          <stop offset="100%" stopColor="#6A5AF9" />
+                          <stop offset="0%" stopColor="#10b981" />
+                          <stop offset="100%" stopColor="#059669" />
                       </linearGradient>
                   </defs>
                 </svg>
@@ -79,22 +79,38 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ result, onOpenCha
                   <AnimatedScore value={energy_optimization_score} />
                 </div>
               </div>
-              <div className="flex-1">
-                  <h3 className="text-xl font-bold text-brand-secondary">Energy Optimization Score</h3>
-                  <p className="text-brand-text-muted mt-1">This score reflects how well your meal aligns with your body blueprint and goals.</p>
+              <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-xl font-bold text-secondary">Wellness Score</h3>
+                  <p className="text-text-secondary mt-1">This score reflects how well your meal aligns with your body blueprint and goals.</p>
               </div>
           </div>
         </div>
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
-        <div className="xl:col-span-3 bg-brand-surface/70 backdrop-blur-xl rounded-2xl p-6 border border-brand-primary/20 animate-stagger opacity-0" style={{ animationDelay: '150ms', animationFillMode: 'forwards' }}>
+        <div className="xl:col-span-3 bg-surface rounded-2xl p-6 border border-border-color shadow-lg shadow-slate-200/50">
           <EnergyChart data={simulation_timeline} />
         </div>
-        <div className="xl:col-span-2 bg-brand-surface/70 backdrop-blur-xl rounded-2xl p-6 border border-brand-primary/20 animate-stagger opacity-0" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
+        <div className="xl:col-span-2 bg-surface rounded-2xl p-6 border border-border-color shadow-lg shadow-slate-200/50">
           <BodyMap data={energy_distribution} />
         </div>
       </div>
-      <div className="animate-stagger opacity-0" style={{ animationDelay: '450ms', animationFillMode: 'forwards' }}>
+       {energy_crash_prediction && (
+        <div className="relative bg-yellow-50 rounded-2xl p-6 border border-yellow-300 shadow-lg shadow-yellow-100">
+            <div className="flex items-start gap-4">
+                <div className="w-10 h-10 flex-shrink-0 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <AlertTriangle className="w-6 h-6 text-yellow-500"/>
+                </div>
+                <div>
+                    <h3 className="text-lg font-bold text-yellow-800">Energy Crash Prediction: {energy_crash_prediction.time_of_dip}</h3>
+                    <p className="text-yellow-700 mt-1">{energy_crash_prediction.reason}</p>
+                    <div className="mt-3 pt-3 border-t border-yellow-200">
+                        <p className="text-sm text-yellow-900"><span className="font-semibold">Mitigation Tip:</span> {energy_crash_prediction.suggestion}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+      )}
+      <div>
         <AiInsights
           insights={insights}
           suggestion={meal_alchemy_suggestion}

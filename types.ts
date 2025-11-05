@@ -1,9 +1,14 @@
+export type AppView = 'dashboard' | 'simulator' | 'genetics' | 'community' | 'settings';
+export type ThemeName = 'emerald' | 'sapphire' | 'ruby' | 'amethyst';
+
 export interface UserProfile {
   age: number;
   weight: number;
   height: number;
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   goal: 'lose_weight' | 'maintain_weight' | 'gain_muscle';
+  geneticsDataStatus?: 'not_connected' | 'pending' | 'connected';
+  microbiomeDataStatus?: 'not_connected' | 'pending' | 'connected';
 }
 
 export interface FoodItem {
@@ -36,6 +41,12 @@ export interface EnergyDistribution {
   immune_system: number;
 }
 
+export interface EnergyCrashPrediction {
+    time_of_dip: string;
+    reason: string;
+    suggestion: string;
+}
+
 export interface SimulationResult {
   simulation_timeline: SimulationTimelinePoint[];
   energy_distribution: EnergyDistribution;
@@ -51,6 +62,7 @@ export interface SimulationResult {
     reasoning: string;
   };
   metabolic_forecast_weekly: string;
+  energy_crash_prediction: EnergyCrashPrediction;
 }
 
 export interface ChatMessage {

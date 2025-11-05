@@ -1,12 +1,17 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { UserProfile, FoodItem, SimulationResult, ChatMessage, SavedMeal } from './types';
+import { UserProfile, AppView, ThemeName } from './types';
 import UserProfileSetup from './components/UserProfileSetup';
-import Dashboard from './components/Dashboard';
-import ChatModal from './components/ChatModal';
-import UserProfileModal from './components/UserProfileModal';
-import AddFoodQuantityModal from './components/AddFoodQuantityModal';
-import { getMealSimulation, startChatSession, sendMessageToChat } from './services/geminiService';
+import Layout from './components/Layout';
+import WellnessDashboard from './components/WellnessDashboard';
+import MealSimulator from './components/MealSimulator';
+import GeneticsMicrobiome from './components/GeneticsMicrobiome';
+import Community from './components/Community';
+import Settings from './components/Settings';
+import DisclaimerModal from './components/DisclaimerModal';
+import { themes } from './themes';
+import { Zap } from './components/icons';
+
 
 const App: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
@@ -17,167 +22,94 @@ const App: React.FC = () => {
       return null;
     }
   });
-  const [currentMeal, setCurrentMeal] = useState<FoodItem[]>([]);
-  const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
-  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
-  const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
-  
-  const [savedMeals, setSavedMeals] = useState<SavedMeal[]>(() => {
-    try {
-        const saved = localStorage.getItem('nutriGuideSavedMeals');
-        return saved ? JSON.parse(saved) : [];
-    } catch (error) {
-        return [];
-    }
+  const [activeView, setActiveView] = useState<AppView>('dashboard');
+  const [isDisclaimerOpen, setDisclaimerOpen] = useState<boolean>(() => {
+    return localStorage.getItem('nutriGuideDisclaimerAccepted') !== 'true';
   });
 
-  const [isProfileModalOpen, setProfileModalOpen] = useState(false);
-  const [foodForQuantity, setFoodForQuantity] = useState<Omit<FoodItem, 'quantity' | 'unit'> | null>(null);
+  const [theme, setTheme] = useState<ThemeName>(() => {
+    const savedTheme = localStorage.getItem('nutriGuideTheme') as ThemeName;
+    return savedTheme && themes[savedTheme] ? savedTheme : 'emerald';
+  });
+  
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (userProfile) {
         localStorage.setItem('nutriGuideProfile', JSON.stringify(userProfile));
     }
   }, [userProfile]);
-
+  
   useEffect(() => {
-    localStorage.setItem('nutriGuideSavedMeals', JSON.stringify(savedMeals));
-  }, [savedMeals]);
-
+    const activeTheme = themes[theme];
+    const root = document.documentElement;
+    for (const [key, value] of Object.entries(activeTheme)) {
+        root.style.setProperty(key, value as string);
+    }
+    localStorage.setItem('nutriGuideTheme', theme);
+  }, [theme]);
+  
+   useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   const handleProfileSubmit = (profile: UserProfile) => {
     setUserProfile(profile);
-    setProfileModalOpen(false);
-  };
-  
-  const handleAddFoodWithQuantity = (food: Omit<FoodItem, 'quantity' | 'unit'>, quantity: string, unit: string) => {
-    if (currentMeal.find(item => item.id === food.id)) return;
-    setCurrentMeal(prev => [...prev, { ...food, quantity, unit }]);
-    setFoodForQuantity(null);
   };
 
-  const handleSimulate = useCallback(async () => {
-    if (!userProfile || currentMeal.length === 0) {
-      setError("Please add food to the Analysis Bay before simulating.");
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-    setSimulationResult(null);
-
-    try {
-      const result = await getMealSimulation(userProfile, currentMeal);
-      setSimulationResult(result);
-      startChatSession(userProfile, currentMeal, result);
-      setChatHistory([{ role: 'model', text: "I've reviewed your Aura analysis. Feel free to ask any questions." }]);
-    } catch (e) {
-      console.error(e);
-      setError("The AI failed to analyze your Aura. This could be due to a configuration issue or an unusual food combination. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userProfile, currentMeal]);
-  
-  const handleSendMessage = async (message: string) => {
-    if (!message.trim()) return;
-
-    const newUserMessage: ChatMessage = { role: 'user', text: message };
-    setChatHistory(prev => [...prev, newUserMessage]);
-    setIsChatLoading(true);
-
-    try {
-      const responseText = await sendMessageToChat(message);
-      const newModelMessage: ChatMessage = { role: 'model', text: responseText };
-      setChatHistory(prev => [...prev, newModelMessage]);
-    } catch (e) {
-        console.error("Chat error:", e);
-        const errorMessage: ChatMessage = { role: 'model', text: "Sorry, I encountered an error. Please try again." };
-        setChatHistory(prev => [...prev, errorMessage]);
-    } finally {
-        setIsChatLoading(false);
-    }
-  }
-
-  const handleClearMeal = () => {
-    setCurrentMeal([]);
-    setSimulationResult(null);
-    setIsChatOpen(false);
+  const handleDisclaimerAccept = () => {
+    localStorage.setItem('nutriGuideDisclaimerAccepted', 'true');
+    setDisclaimerOpen(false);
   }
   
-  const handleSaveMeal = () => {
-    if (currentMeal.length === 0) return;
-    const mealName = prompt("Enter a name for this meal composition:", "My Go-To Lunch");
-    if (mealName && currentMeal.length > 0) {
-        const newSavedMeal: SavedMeal = {
-            id: new Date().toISOString(),
-            name: mealName,
-            foods: currentMeal,
-        };
-        setSavedMeals(prev => [newSavedMeal, ...prev]);
+  const showToast = (message: string) => {
+    setToastMessage(message);
+  };
+
+  const renderContent = () => {
+    switch (activeView) {
+      case 'dashboard':
+        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowToast={showToast} />;
+      case 'simulator':
+        return <MealSimulator userProfile={userProfile!} />;
+      case 'genetics':
+        return <GeneticsMicrobiome onShowToast={showToast}/>;
+       case 'community':
+        return <Community />;
+      case 'settings':
+        return <Settings userProfile={userProfile!} onProfileUpdate={handleProfileSubmit} theme={theme} onThemeChange={setTheme} onShowToast={showToast}/>;
+      default:
+        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowToast={showToast} />;
     }
   };
-  
-  const handleLoadMeal = (meal: SavedMeal) => {
-    setCurrentMeal(meal.foods);
-    setSimulationResult(null);
-  }
-
-  const handleBackToBuilder = () => {
-    setSimulationResult(null);
-    setError(null);
-  }
 
   if (!userProfile) {
-    return <UserProfileSetup onSubmit={handleProfileSubmit} />;
+    return (
+      <>
+        {isDisclaimerOpen && <DisclaimerModal onClose={handleDisclaimerAccept} />}
+        <UserProfileSetup onSubmit={handleProfileSubmit} />
+      </>
+    );
   }
 
   return (
-    <div className="min-h-screen w-full font-sans antialiased">
-      <Dashboard
-        userProfile={userProfile}
-        currentMeal={currentMeal}
-        setCurrentMeal={setCurrentMeal}
-        handleSimulate={handleSimulate}
-        handleClearMeal={handleClearMeal}
-        simulationResult={simulationResult}
-        isLoading={isLoading}
-        error={error}
-        onOpenChat={() => setIsChatOpen(true)}
-        onSaveMeal={handleSaveMeal}
-        onSelectFoodForQuantity={(food) => setFoodForQuantity(food)}
-        savedMeals={savedMeals}
-        onLoadMeal={handleLoadMeal}
-        onOpenProfile={() => setProfileModalOpen(true)}
-        onBackToBuilder={handleBackToBuilder}
-      />
-      
-      {foodForQuantity && (
-        <AddFoodQuantityModal
-            foodItem={foodForQuantity}
-            onClose={() => setFoodForQuantity(null)}
-            onAdd={handleAddFoodWithQuantity}
-        />
-      )}
-
-      {isProfileModalOpen && (
-        <UserProfileModal 
-            currentUserProfile={userProfile}
-            onClose={() => setProfileModalOpen(false)}
-            onSubmit={handleProfileSubmit}
-        />
-      )}
-
-      <ChatModal 
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        history={chatHistory}
-        onSendMessage={handleSendMessage}
-        isLoading={isChatLoading}
-      />
+    <div className="min-h-screen w-full font-sans antialiased relative">
+       {isDisclaimerOpen && <DisclaimerModal onClose={handleDisclaimerAccept} />}
+       <Layout activeView={activeView} setActiveView={setActiveView}>
+         {renderContent()}
+       </Layout>
+       {toastMessage && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-secondary text-white py-3 px-6 rounded-full shadow-lg z-50 flex items-center gap-2 animate-slide-in-up">
+            <Zap className="w-5 h-5" />
+            <span>{toastMessage}</span>
+        </div>
+       )}
     </div>
   );
 };

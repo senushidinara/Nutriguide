@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
 
@@ -28,14 +27,14 @@ const UserProfileSetup: React.FC<UserProfileSetupProps> = ({ onSubmit }) => {
     onSubmit(profile);
   };
 
-  const inputClasses = "w-full bg-brand-surface border border-brand-primary/50 rounded-lg p-3 text-brand-text placeholder-brand-text-muted focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all";
-  const labelClasses = "block text-sm font-medium text-brand-secondary mb-2";
+  const inputClasses = "w-full bg-background border border-border-color rounded-lg p-3 text-text-primary placeholder-text-muted focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all";
+  const labelClasses = "block text-sm font-medium text-text-secondary mb-2";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-brand-bg p-4 animate-fade-in">
-      <div className="w-full max-w-lg bg-brand-surface rounded-2xl shadow-2xl shadow-brand-primary/10 p-8 border border-brand-primary/20">
-        <h1 className="text-3xl font-bold text-center text-brand-text mb-2">Welcome to NutriGuide</h1>
-        <p className="text-center text-brand-text-muted mb-8">Create your Body Blueprint to start simulating.</p>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 animate-fade-in">
+      <div className="w-full max-w-lg bg-surface rounded-2xl shadow-xl shadow-slate-200/50 p-8 border border-border-color">
+        <h1 className="text-3xl font-bold text-center text-secondary mb-2">Welcome to NutriGuide AI</h1>
+        <p className="text-center text-text-secondary mb-8">Create your Body Blueprint. This personalized digital model of your metabolism allows us to simulate your body's unique response to any meal.</p>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -73,8 +72,8 @@ const UserProfileSetup: React.FC<UserProfileSetupProps> = ({ onSubmit }) => {
             </select>
           </div>
 
-          <button type="submit" className="w-full bg-brand-primary hover:bg-opacity-80 text-white font-bold py-3 px-4 rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-brand-primary/50">
-            Start Simulation
+          <button type="submit" className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 px-4 rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary/50">
+            Create My Blueprint
           </button>
         </form>
       </div>

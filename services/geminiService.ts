@@ -1,19 +1,13 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import { UserProfile, FoodItem, SimulationResult } from "../types";
 
-const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;
+const API_KEY = process.env.API_KEY;
 
-let ai: GoogleGenAI | null = null;
+if (!API_KEY) {
+  throw new Error("API_KEY environment variable is not set.");
+}
 
-const getAI = () => {
-  if (!ai) {
-    if (!API_KEY) {
-      throw new Error("GEMINI_API_KEY environment variable is not set. Please configure your API key.");
-    }
-    ai = new GoogleGenAI({ apiKey: API_KEY });
-  }
-  return ai;
-};
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 let chatSession: Chat | null = null;
 
 const responseSchema = {
@@ -71,9 +65,19 @@ const responseSchema = {
         metabolic_forecast_weekly: {
             type: Type.STRING,
             description: "A one-sentence forecast of the metabolic impact if this meal pattern is followed for a week."
+        },
+        energy_crash_prediction: {
+            type: Type.OBJECT,
+            description: "Identifies the most significant potential energy dip (crash) in the timeline, its cause, and a suggestion to mitigate it.",
+            properties: {
+                time_of_dip: { type: Type.STRING, description: "The approximate time of the energy dip (e.g., 'Around hour 4' or 'Mid-afternoon')." },
+                reason: { type: Type.STRING, description: "A brief explanation for why the energy crash is predicted to occur." },
+                suggestion: { type: Type.STRING, description: "A short, actionable tip to prevent or lessen the impact of the crash." }
+            },
+            required: ["time_of_dip", "reason", "suggestion"]
         }
     },
-    required: ["simulation_timeline", "energy_distribution", "energy_optimization_score", "insights", "meal_alchemy_suggestion", "metabolic_forecast_weekly"]
+    required: ["simulation_timeline", "energy_distribution", "energy_optimization_score", "insights", "meal_alchemy_suggestion", "metabolic_forecast_weekly", "energy_crash_prediction"]
 };
 
 export const getMealSimulation = async (userProfile: UserProfile, meal: FoodItem[]): Promise<SimulationResult> => {
@@ -93,12 +97,12 @@ export const getMealSimulation = async (userProfile: UserProfile, meal: FoodItem
       ${mealDescription}
 
       **Task:**
-      Analyze the provided meal based on the user's profile. Generate a comprehensive, 24-hour simulation of its impact on their physical, cognitive, and emotional energy. Provide deep, actionable insights and a creative 'meal alchemy' suggestion. The simulation should be scientifically plausible but creative and engaging. Fill out all fields in the provided JSON schema. The simulation timeline must contain exactly 24 hourly data points.
+      Analyze the provided meal based on the user's profile. Generate a comprehensive, 24-hour simulation of its impact on their physical, cognitive, and emotional energy. Provide deep, actionable insights and a creative 'meal alchemy' suggestion. Specifically identify the most likely time for an energy crash (a significant dip in physical or cognitive energy), explain why it happens, and offer a tip to mitigate it. The simulation should be scientifically plausible but creative and engaging. Fill out all fields in the provided JSON schema. The simulation timeline must contain exactly 24 hourly data points.
     `;
 
-    const systemInstruction = "You are NutriGuide, a personalized, predictive, multi-dimensional energy management AI. Your purpose is to simulate how meals affect a user's energy. You must provide detailed, actionable, and scientifically-plausible insights. Always respond with a valid JSON object matching the specified schema, with no additional text or markdown formatting.";
+    const systemInstruction = "You are NutriGuide, a personalized, predictive, multi-dimensional energy management AI. You combine nutrition science, sleep science, and performance coaching to simulate how meals affect a user's energy. Your purpose is to act as an advanced predictive modeling engine, providing detailed, actionable, and scientifically-plausible insights. Always respond with a valid JSON object matching the specified schema, with no additional text or markdown formatting.";
 
-    const response = await getAI().models.generateContent({
+    const response = await ai.models.generateContent({
         model: model,
         contents: prompt,
         config: {
@@ -123,7 +127,7 @@ export const startChatSession = (userProfile: UserProfile, meal: FoodItem[], sim
     const mealDescription = meal.map(item => `${item.name} (${item.quantity}${item.unit})`).join(', ');
     const simulationSummary = JSON.stringify(simulationResult, null, 2);
 
-    const systemInstruction = `You are a helpful and knowledgeable nutrition assistant for the NutriGuide app. Your role is to discuss the user's meal simulation results. You have been provided with the user's profile, the meal they ate, and the detailed simulation data. Answer their questions clearly and concisely. Do not refer to yourself as an AI. Be conversational and encouraging. Use the provided context to give personalized advice.`;
+    const systemInstruction = `You are a helpful and knowledgeable nutrition assistant for the NutriGuide app. Your role is to discuss the user's meal simulation results and act as a translator for their body's signals. You have been provided with the user's profile, the meal they ate, and the detailed simulation data. Answer their questions clearly and concisely. Do not refer to yourself as an AI. Be conversational, encouraging, and help the user build better intuition about their body's needs. Use the provided context to give personalized advice.`;
 
     const initialHistory = [
         {
@@ -150,7 +154,7 @@ export const startChatSession = (userProfile: UserProfile, meal: FoodItem[], sim
         }
     ];
     
-    chatSession = getAI().chats.create({
+    chatSession = ai.chats.create({
         model: 'gemini-2.5-flash',
         config: { systemInstruction },
         history: initialHistory,

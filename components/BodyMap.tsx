@@ -10,16 +10,16 @@ const BodyMap: React.FC<BodyMapProps> = ({ data }) => {
   
   const StatItem = ({ icon: Icon, label, value }: { icon: React.ComponentType<{className?: string}>, label: string, value: number}) => (
     <div className="flex items-center gap-3">
-        <div className="w-10 h-10 flex-shrink-0 bg-brand-primary/10 rounded-lg flex items-center justify-center">
-            <Icon className="w-6 h-6 text-brand-accent"/>
+        <div className="w-10 h-10 flex-shrink-0 bg-accent/50 rounded-lg flex items-center justify-center">
+            <Icon className="w-6 h-6 text-primary"/>
         </div>
         <div>
-            <span className="text-sm text-brand-text-muted">{label}</span>
-            <p className="font-bold text-brand-text text-lg">{value}/100</p>
+            <span className="text-sm text-text-secondary">{label}</span>
+            <p className="font-bold text-text-primary text-lg">{value}/100</p>
         </div>
-        <div className="ml-auto w-1/4 h-2 bg-brand-primary/10 rounded-full">
+        <div className="ml-auto w-1/4 h-2 bg-slate-100 rounded-full">
             <div 
-                className="h-2 bg-gradient-to-r from-brand-primary to-brand-accent rounded-full transition-all duration-1000"
+                className="h-2 bg-gradient-to-r from-primary to-emerald-400 rounded-full transition-all duration-1000"
                 style={{width: `${value}%`}}
             ></div>
         </div>
@@ -28,7 +28,7 @@ const BodyMap: React.FC<BodyMapProps> = ({ data }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <h3 className="text-xl font-bold text-brand-secondary mb-4">Aura Distribution Map</h3>
+      <h3 className="text-xl font-bold text-secondary mb-4">Energy Distribution Map</h3>
       <div className="relative flex-grow flex items-center justify-center my-4">
         <svg viewBox="0 0 200 300" className="w-auto h-64">
           <defs>
@@ -38,16 +38,16 @@ const BodyMap: React.FC<BodyMapProps> = ({ data }) => {
               <feComposite in="glow" in2="SourceGraphic" operator="over" />
             </filter>
              <radialGradient id="brain-gradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#A69EFF" />
-                <stop offset="100%" stopColor="#6A5AF9" />
+                <stop offset="0%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#6d28d9" />
             </radialGradient>
             <radialGradient id="muscle-gradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#00F5D4" />
-                <stop offset="100%" stopColor="#00b8a2" />
+                <stop offset="0%" stopColor="#059669" />
+                <stop offset="100%" stopColor="#065f46" />
             </radialGradient>
             <radialGradient id="gut-gradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#f5d400" />
-                <stop offset="100%" stopColor="#f5a600" />
+                <stop offset="0%" stopColor="#f59e0b" />
+                <stop offset="100%" stopColor="#d97706" />
             </radialGradient>
           </defs>
           
@@ -55,11 +55,11 @@ const BodyMap: React.FC<BodyMapProps> = ({ data }) => {
           <path 
             d="M 100,50 C 70,50 60,70 60,100 L 60,200 C 60,250 70,290 100,290 C 130,290 140,250 140,200 L 140,100 C 140,70 130,50 100,50 Z" 
             fill="none" 
-            stroke="#6A5AF9" 
+            stroke="#059669" 
             strokeOpacity="0.1" 
             strokeWidth="2"
           />
-          <circle cx="100" cy="40" r="25" fill="none" stroke="#6A5AF9" strokeOpacity="0.1" strokeWidth="2" />
+          <circle cx="100" cy="40" r="25" fill="none" stroke="#059669" strokeOpacity="0.1" strokeWidth="2" />
 
           {/* Glowing Aura Parts */}
           <g filter="url(#aura-glow)">
@@ -69,7 +69,7 @@ const BodyMap: React.FC<BodyMapProps> = ({ data }) => {
               <ellipse cx="100" cy="150" rx="25" ry="35" fill="url(#gut-gradient)" className="transition-opacity duration-1000" style={{ opacity: data.digestive_system / 150 }}/>
               <path 
                 d="M 100,50 C 70,50 60,70 60,100 L 60,200 C 60,250 70,290 100,290 C 130,290 140,250 140,200 L 140,100 C 140,70 130,50 100,50 Z" 
-                fill="#00F5D4" 
+                fill="#06b6d4" 
                 fillOpacity="0.1"
                  className="transition-opacity duration-1000"
                  style={{ opacity: data.immune_system / 200 }}

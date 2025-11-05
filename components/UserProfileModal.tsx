@@ -24,25 +24,25 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ onSubmit, onClose, 
     onSubmit(profile);
   };
 
-  const inputClasses = "w-full bg-brand-bg border border-brand-primary/50 rounded-lg p-3 text-brand-text placeholder-brand-text-muted focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all";
-  const labelClasses = "block text-sm font-medium text-brand-secondary mb-2";
+  const inputClasses = "w-full bg-background border border-border-color rounded-lg p-3 text-text-primary placeholder-text-muted focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all";
+  const labelClasses = "block text-sm font-medium text-text-secondary mb-2";
 
   return (
     <div 
-      className="fixed inset-0 bg-brand-bg/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
       onClick={onClose}
     >
       <div 
-        className="bg-brand-surface rounded-2xl shadow-2xl shadow-brand-primary/20 border border-brand-primary/20 w-full max-w-lg relative animate-slide-in-up"
+        className="bg-surface rounded-2xl shadow-2xl shadow-slate-300/60 border border-border-color w-full max-w-lg relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full hover:bg-brand-bg">
-          <X className="w-5 h-5 text-brand-text-muted" />
+        <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full hover:bg-background">
+          <X className="w-5 h-5 text-text-muted" />
         </button>
 
         <div className="p-8">
-            <h1 className="text-3xl font-bold text-center text-brand-text mb-2">Update Your Blueprint</h1>
-            <p className="text-center text-brand-text-muted mb-8">Keep your profile current for accurate simulations.</p>
+            <h1 className="text-3xl font-bold text-center text-secondary mb-2">Update Your Blueprint</h1>
+            <p className="text-center text-text-secondary mb-8">Keep your profile current for accurate simulations.</p>
             
             <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -80,7 +80,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ onSubmit, onClose, 
                 </select>
             </div>
 
-            <button type="submit" className="w-full bg-brand-primary hover:bg-opacity-80 text-white font-bold py-3 px-4 rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-brand-primary/50">
+            <button type="submit" className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 px-4 rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary/50">
                 Save Changes
             </button>
             </form>

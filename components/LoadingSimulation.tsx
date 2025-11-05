@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
 const loadingTexts = [
+    "Running thousands of micro-simulations...",
     "Analyzing macronutrient synergy...",
     "Simulating digestive absorption rates...",
     "Mapping cognitive energy pathways...",
     "Calculating circadian rhythm impact...",
     "Cross-referencing your body blueprint...",
     "Predicting metabolic ripple effects...",
-    "Calibrating Aura resonance...",
+    "Integrating nutrition and sleep science...",
+    "Calibrating wellness resonance...",
+    "Modeling advanced predictive analytics...",
 ];
 
 const LoadingSimulation: React.FC = () => {
@@ -21,19 +24,19 @@ const LoadingSimulation: React.FC = () => {
     }, []);
 
     return (
-        <div className="h-full min-h-[500px] flex flex-col items-center justify-center bg-brand-surface/60 backdrop-blur-xl border border-brand-primary/20 rounded-2xl p-8 text-center animate-fade-in">
+        <div className="h-full min-h-[500px] flex flex-col items-center justify-center p-8 text-center animate-fade-in">
             <div className="relative w-40 h-40 mb-8 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full bg-brand-primary/10 animate-pulse"></div>
-                <div className="absolute inset-2 rounded-full border-2 border-brand-primary/30"></div>
-                <div className="absolute inset-4 rounded-full bg-brand-bg"></div>
-                <div className="absolute h-full w-px bg-gradient-to-b from-transparent via-brand-accent to-transparent animate-spin" style={{animationDuration: '3s'}}></div>
-                <svg viewBox="0 0 100 100" className="w-24 h-24 text-brand-accent">
+                <div className="absolute inset-0 rounded-full bg-primary/5 animate-pulse"></div>
+                <div className="absolute inset-2 rounded-full border-2 border-primary/10"></div>
+                <div className="absolute inset-4 rounded-full bg-background"></div>
+                <div className="absolute h-full w-px bg-gradient-to-b from-transparent via-primary to-transparent animate-spin" style={{animationDuration: '3s'}}></div>
+                <svg viewBox="0 0 100 100" className="w-24 h-24 text-primary animate-pulse">
                     <path d="M 50,5 A 45,45 0 1 1 5,50" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/>
                 </svg>
             </div>
-            <h2 className="text-3xl font-bold text-brand-secondary">Analyzing Aura...</h2>
+            <h2 className="text-3xl font-bold text-secondary">Running Simulation...</h2>
             <div className="h-6 mt-4">
-                 <p key={textIndex} className="text-brand-text-muted animate-fade-in">
+                 <p key={textIndex} className="text-text-secondary animate-fade-in">
                     {loadingTexts[textIndex]}
                 </p>
             </div>
