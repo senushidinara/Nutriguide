@@ -1,51 +1,7 @@
 # 🌟 NutriGuide AI: Your Predictive Wellness Co-pilot 🌟
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>NutriGuide AI Banner</title>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: Arial, sans-serif;
-    }
-
-    .banner {
-      background: url('https://i.imgur.com/8L1w5gC.png') no-repeat center center;
-      background-size: cover;
-      width: 100%;
-      height: 300px; /* adjust height as needed */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #fff;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
-    }
-
-    .banner h1 {
-      font-size: 48px;
-      margin: 0;
-    }
-
-    @media (max-width: 900px) {
-      .banner {
-        height: 200px;
-      }
-      .banner h1 {
-        font-size: 32px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="banner">
-    <h1>NutriGuide AI</h1>
-  </div>
-</body>
-</html>
+| ![NutriGuide AI Banner](https://i.imgur.com/8L1w5gC.png) |
+|:---------------------------------------------------------:|
 
 <p align="center">
   <strong>🔮 Run a clinical trial on your meals... <em>before</em> you eat them. 🔮</strong>
