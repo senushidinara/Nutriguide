@@ -1,7 +1,5 @@
 # 🌟 NutriGuide AI: Your Predictive Wellness Co-pilot 🌟
-
-<img src="https://i.imgur.com/8L1w5gC.png" alt="NutriGuide AI Banner" style="display:block; margin:0 auto; width:800px; max-width:100%;">
-
+![NutriGuide AI Banner](https://raw.githubusercontent.com/senushidinara/Nutriguide/main/IMG_7850.jpeg)
 <p align="center">
   <strong>🔮 Run a clinical trial on your meals... <em>before</em> you eat them. 🔮</strong>
 </p>
