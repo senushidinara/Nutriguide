@@ -6,30 +6,43 @@
   <meta charset="UTF-8">
   <title>NutriGuide AI Banner</title>
   <style>
-    body {
+    body, html {
       margin: 0;
       padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    .banner {
+      background: url('https://i.imgur.com/8L1w5gC.png') no-repeat center center;
+      background-size: cover;
+      width: 100%;
+      height: 300px; /* adjust height as needed */
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh; /* Center vertically */
-      background-color: #f9f9f9; /* Optional background */
+      color: #fff;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
     }
-    .banner {
-      text-align: center;
+
+    .banner h1 {
+      font-size: 48px;
+      margin: 0;
     }
-    .banner img {
-      width: 800px;
-      max-width: 90%; /* Responsive for smaller screens */
-      height: auto;
-      border-radius: 12px; /* Optional: rounded corners */
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Optional shadow */
+
+    @media (max-width: 900px) {
+      .banner {
+        height: 200px;
+      }
+      .banner h1 {
+        font-size: 32px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="banner">
-    <img src="https://i.imgur.com/8L1w5gC.png" alt="NutriGuide AI Banner">
+    <h1>NutriGuide AI</h1>
   </div>
 </body>
 </html>
