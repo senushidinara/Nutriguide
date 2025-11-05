@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '../types';
-import { X, Zap, Sparkles } from './icons';
+import { X, Zap, Sparkles, LinkIcon } from './icons';
 
 interface ChatModalProps {
   isOpen: boolean;
@@ -60,7 +60,22 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, history, onSendM
                 {msg.role === 'user' ? 'U' : <Sparkles className="w-5 h-5" />}
               </div>
               <div className={`px-4 py-3 rounded-2xl ${msg.role === 'user' ? 'bg-slate-700 text-white rounded-br-none' : 'bg-slate-100 text-text-primary rounded-bl-none'}`}>
-                 <p className="leading-relaxed">{msg.text}</p>
+                 <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                 {msg.groundingSources && msg.groundingSources.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-border-color">
+                        <h4 className="text-xs font-bold text-text-secondary mb-1">Sources:</h4>
+                        <ul className="space-y-1">
+                            {msg.groundingSources.map((source, i) => (
+                                <li key={i}>
+                                    <a href={source.uri} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-primary hover:underline">
+                                        <LinkIcon className="w-3 h-3"/>
+                                        <span className="truncate">{source.title || source.uri}</span>
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                 )}
               </div>
             </div>
           ))}
@@ -88,7 +103,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, history, onSendM
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about your results..."
+              placeholder="Ask a question..."
               className="w-full bg-background border border-border-color rounded-lg p-3 text-text-primary placeholder-text-muted focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
               disabled={isLoading}
             />

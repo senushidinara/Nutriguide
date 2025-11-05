@@ -10,8 +10,11 @@ import GeneticsMicrobiome from './components/GeneticsMicrobiome';
 import Community from './components/Community';
 import Settings from './components/Settings';
 import DisclaimerModal from './components/DisclaimerModal';
+import WeeklyReportModal from './components/WeeklyReportModal';
+import InfoModal from './components/InfoModal';
 import { themes } from './themes';
 import { Zap } from './components/icons';
+import { getChatResponse } from './services/geminiService';
 
 
 const App: React.FC = () => {
@@ -28,6 +31,9 @@ const App: React.FC = () => {
   const [isDisclaimerOpen, setDisclaimerOpen] = useState<boolean>(() => {
     return localStorage.getItem('nutriGuideDisclaimerAccepted') !== 'true';
   });
+  
+  const [isWeeklyReportOpen, setWeeklyReportOpen] = useState(false);
+  const [infoModalContent, setInfoModalContent] = useState<{title: string, content: React.ReactNode} | null>(null);
 
   const [theme, setTheme] = useState<ThemeName>(() => {
     const savedTheme = localStorage.getItem('nutriGuideTheme') as ThemeName;
@@ -35,12 +41,28 @@ const App: React.FC = () => {
   });
   
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  
+  const [userLocation, setUserLocation] = useState<{latitude: number, longitude: number} | null>(null);
 
   useEffect(() => {
     if (userProfile) {
         localStorage.setItem('nutriGuideProfile', JSON.stringify(userProfile));
     }
   }, [userProfile]);
+  
+  useEffect(() => {
+     navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.warn("Could not get user location:", error.message);
+      }
+    );
+  }, []);
   
   useEffect(() => {
     const activeTheme = themes[theme];
@@ -85,22 +107,46 @@ const App: React.FC = () => {
   const showToast = (message: string) => {
     setToastMessage(message);
   };
+  
+  const handleShowInfoModal = (title: string, content: React.ReactNode) => {
+    setInfoModalContent({ title, content });
+  };
+  
+  const handleUpdateConnectionStatus = (
+    type: 'geneticsDataStatus' | 'microbiomeDataStatus' | 'wearableStatus',
+    status: 'not_connected' | 'pending' | 'connected'
+  ) => {
+    if (userProfile) {
+      setUserProfile(prev => prev ? { ...prev, [type]: status } : null);
+    }
+  };
 
   const renderContent = () => {
     const currentFont = themes[theme].fonts['--font-family-sans'].includes('Lora') ? 'font-serif' : 'font-sans';
     switch (activeView) {
       case 'dashboard':
-        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowToast={showToast} currentFont={currentFont} />;
+        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowReport={() => setWeeklyReportOpen(true)} currentFont={currentFont} />;
       case 'simulator':
-        return <MealSimulator userProfile={userProfile!} currentFont={currentFont}/>;
+        return <MealSimulator userProfile={userProfile!} onProfileUpdate={handleProfileSubmit} currentFont={currentFont} getChatResponse={getChatResponse} userLocation={userLocation}/>;
       case 'genetics':
-        return <GeneticsMicrobiome onShowToast={showToast} currentFont={currentFont}/>;
+        return <GeneticsMicrobiome 
+                    userProfile={userProfile!} 
+                    onUpdateStatus={handleUpdateConnectionStatus}
+                    currentFont={currentFont}
+                />;
        case 'community':
         return <Community currentFont={currentFont}/>;
       case 'settings':
-        return <Settings userProfile={userProfile!} onProfileUpdate={handleProfileSubmit} theme={theme} onThemeChange={setTheme} onShowToast={showToast} currentFont={currentFont} />;
+        return <Settings 
+                    userProfile={userProfile!} 
+                    onProfileUpdate={handleProfileSubmit} 
+                    theme={theme} 
+                    onThemeChange={setTheme} 
+                    onShowInfo={handleShowInfoModal}
+                    onUpdateStatus={handleUpdateConnectionStatus}
+                    currentFont={currentFont} />;
       default:
-        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowToast={showToast} currentFont={currentFont}/>;
+        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowReport={() => setWeeklyReportOpen(true)} currentFont={currentFont}/>;
     }
   };
 
@@ -125,6 +171,8 @@ const App: React.FC = () => {
             <span>{toastMessage}</span>
         </div>
        )}
+       {isWeeklyReportOpen && <WeeklyReportModal onClose={() => setWeeklyReportOpen(false)} />}
+       {infoModalContent && <InfoModal title={infoModalContent.title} onClose={() => setInfoModalContent(null)}>{infoModalContent.content}</InfoModal>}
     </div>
   );
 };

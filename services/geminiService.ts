@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
-import { UserProfile, FoodItem, SimulationResult } from "../types";
+import { UserProfile, FoodItem, SimulationResult, GroundingSource } from "../types";
 
 const API_KEY = process.env.API_KEY;
 
@@ -161,11 +161,63 @@ export const startChatSession = (userProfile: UserProfile, meal: FoodItem[], sim
     });
 };
 
-export const sendMessageToChat = async (message: string): Promise<string> => {
+const getGroundedResponse = async (message: string, location: {latitude: number, longitude: number} | null) => {
+    const tools = [{googleSearch: {}}];
+    let toolConfig;
+
+    if (location) {
+        tools.push({googleMaps: {}});
+        toolConfig = {
+            retrievalConfig: {
+                latLng: {
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                }
+            }
+        }
+    }
+    
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: message,
+        config: {
+            tools,
+            ...(toolConfig && { toolConfig })
+        },
+    });
+
+    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+    const sources: GroundingSource[] = groundingChunks.map((chunk: any) => {
+        if (chunk.web) {
+            return { uri: chunk.web.uri, title: chunk.web.title };
+        }
+        if (chunk.maps) {
+            return { uri: chunk.maps.uri, title: chunk.maps.title };
+        }
+        return null;
+    }).filter(Boolean);
+
+
+    return { text: response.text, groundingSources: sources };
+};
+
+export const getChatResponse = async (
+    message: string,
+    location: { latitude: number; longitude: number } | null
+): Promise<{ text: string; groundingSources?: GroundingSource[] }> => {
+
+    const groundingKeywords = ['latest', 'news', 'find', 'nearby', 'current events', 'who won', 'what is the score', 'recipe for'];
+
+    const shouldUseGrounding = groundingKeywords.some(keyword => message.toLowerCase().includes(keyword));
+
+    if (shouldUseGrounding) {
+        return getGroundedResponse(message, location);
+    }
+    
     if (!chatSession) {
         throw new Error("Chat session not initialized. Please run a simulation first.");
     }
-
+    
     const response = await chatSession.sendMessage({ message });
-    return response.text;
+    return { text: response.text };
 };

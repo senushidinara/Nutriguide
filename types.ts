@@ -9,6 +9,7 @@ export interface UserProfile {
   goal: 'lose_weight' | 'maintain_weight' | 'gain_muscle';
   geneticsDataStatus?: 'not_connected' | 'pending' | 'connected';
   microbiomeDataStatus?: 'not_connected' | 'pending' | 'connected';
+  wearableStatus?: 'not_connected' | 'pending' | 'connected';
 }
 
 export interface FoodItem {
@@ -65,9 +66,15 @@ export interface SimulationResult {
   energy_crash_prediction: EnergyCrashPrediction;
 }
 
+export interface GroundingSource {
+    uri: string;
+    title: string;
+}
+
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
+  groundingSources?: GroundingSource[];
 }
 
 export interface SavedMeal {

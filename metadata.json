@@ -1,5 +1,7 @@
 {
   "name": "NutriGuide: AI Energy Simulator",
   "description": "A personalized health co-pilot that runs a clinical trial on your meals before you eat them. By creating a 'Body Blueprint' and running thousands of micro-simulations, it provides holistic analysis on your energy, mood, and focus, moving beyond generic advice to deliver fully individualized wellness optimization.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "geolocation"
+  ]
 }

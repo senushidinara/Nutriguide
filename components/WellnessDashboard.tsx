@@ -6,11 +6,11 @@ import AnimatedScore from './AnimatedScore';
 interface WellnessDashboardProps {
     userProfile: UserProfile;
     onNavigate: (view: AppView) => void;
-    onShowToast: (message: string) => void;
+    onShowReport: () => void;
     currentFont: 'font-sans' | 'font-serif';
 }
 
-const WellnessDashboard: React.FC<WellnessDashboardProps> = ({ userProfile, onNavigate, onShowToast, currentFont }) => {
+const WellnessDashboard: React.FC<WellnessDashboardProps> = ({ userProfile, onNavigate, onShowReport, currentFont }) => {
     
     const wellnessScore = 88; // Mock data
     
@@ -71,7 +71,7 @@ const WellnessDashboard: React.FC<WellnessDashboardProps> = ({ userProfile, onNa
                     title="Weekly Trend"
                     text="Your cognitive focus score has increased by 12% this week. Keep up the consistent meal timing and balanced macronutrients!"
                     buttonText="View Full Report"
-                    onClick={() => onShowToast('Full reports feature coming soon!')}
+                    onClick={onShowReport}
                     currentFont={currentFont}
                 />
             </div>

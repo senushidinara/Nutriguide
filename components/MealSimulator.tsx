@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { UserProfile, FoodItem, SimulationResult, ChatMessage, SavedMeal } from '../types';
+import { UserProfile, FoodItem, SimulationResult, ChatMessage, SavedMeal, GroundingSource } from '../types';
 import FoodSelector from './FoodSelector';
 import MealBuilder from './MealBuilder';
 import SimulationDisplay from './SimulationDisplay';
@@ -7,16 +7,19 @@ import LoadingSimulation from './LoadingSimulation';
 import AddFoodQuantityModal from './AddFoodQuantityModal';
 import ChatModal from './ChatModal';
 import UserProfileModal from './UserProfileModal';
-import { getMealSimulation, startChatSession, sendMessageToChat } from '../services/geminiService';
+import { getMealSimulation, startChatSession, getChatResponse } from '../services/geminiService';
 import { ServerCrash, ArrowLeft } from './icons';
 
 
 interface MealSimulatorProps {
   userProfile: UserProfile;
+  onProfileUpdate: (profile: UserProfile) => void;
   currentFont: 'font-sans' | 'font-serif';
+  getChatResponse: (message: string, location: {latitude: number, longitude: number} | null) => Promise<{ text: string, groundingSources?: GroundingSource[] }>;
+  userLocation: {latitude: number, longitude: number} | null;
 }
 
-const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfile, currentFont }) => {
+const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfile, onProfileUpdate, currentFont, userLocation }) => {
   const [userProfile, setUserProfile] = useState<UserProfile>(initialProfile);
   const [currentMeal, setCurrentMeal] = useState<FoodItem[]>([]);
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
@@ -39,7 +42,7 @@ const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfi
 
   const handleProfileUpdate = (profile: UserProfile) => {
     setUserProfile(profile);
-    localStorage.setItem('nutriGuideProfile', JSON.stringify(profile));
+    onProfileUpdate(profile);
     setProfileModalOpen(false);
   };
   
@@ -62,7 +65,7 @@ const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfi
       const result = await getMealSimulation(userProfile, currentMeal);
       setSimulationResult(result);
       startChatSession(userProfile, currentMeal, result);
-      setChatHistory([{ role: 'model', text: "I've reviewed your simulation results. Feel free to ask any questions." }]);
+      setChatHistory([{ role: 'model', text: "I've reviewed your simulation results. Feel free to ask any questions, including real-time info like 'find healthy restaurants near me'." }]);
     } catch (e) {
       console.error(e);
       setError("The AI failed to analyze your meal. This could be due to a configuration issue or an unusual food combination. Please try again.");
@@ -78,10 +81,15 @@ const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfi
     setIsChatLoading(true);
 
     try {
-      const responseText = await sendMessageToChat(message);
-      const newModelMessage: ChatMessage = { role: 'model', text: responseText };
+      const response = await getChatResponse(message, userLocation);
+      const newModelMessage: ChatMessage = { 
+          role: 'model', 
+          text: response.text,
+          groundingSources: response.groundingSources 
+        };
       setChatHistory(prev => [...prev, newModelMessage]);
     } catch (e) {
+        console.error("Chat Error", e);
         const errorMessage: ChatMessage = { role: 'model', text: "Sorry, I encountered an error. Please try again." };
         setChatHistory(prev => [...prev, errorMessage]);
     } finally {

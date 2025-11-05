@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserProfile, ThemeName } from '../types';
 import UserProfileModal from './UserProfileModal';
-import { UserIcon, Shield, Zap, AlertTriangle, Dna, FileText } from './icons';
+import { UserIcon, Shield, Zap, AlertTriangle, Dna, FileText, Loader, CheckCircle } from './icons';
 import { themes } from '../themes';
 
 interface SettingsProps {
@@ -9,12 +9,41 @@ interface SettingsProps {
     onProfileUpdate: (profile: UserProfile) => void;
     theme: ThemeName;
     onThemeChange: (theme: ThemeName) => void;
-    onShowToast: (message: string) => void;
+    onShowInfo: (title: string, content: React.ReactNode) => void;
+    onUpdateStatus: (type: 'wearableStatus', status: 'not_connected' | 'pending' | 'connected') => void;
     currentFont: 'font-sans' | 'font-serif';
 }
 
-const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme, onThemeChange, onShowToast, currentFont }) => {
+const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme, onThemeChange, onShowInfo, onUpdateStatus, currentFont }) => {
     const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+    
+    const handleConnectWearables = () => {
+        onUpdateStatus('wearableStatus', 'pending');
+        setTimeout(() => onUpdateStatus('wearableStatus', 'connected'), 2000);
+    };
+
+    const legalContent = {
+        terms: (
+            <div className="space-y-4 text-sm text-text-secondary">
+                <p><strong>Last Updated: {new Date().toLocaleDateString()}</strong></p>
+                <p>Welcome to NutriGuide AI. By using our application, you agree to these terms. Our service provides personalized nutritional insights based on the data you provide. This is for informational purposes only and is not medical advice.</p>
+                <p>You grant us a license to use the data you submit to improve our services. We are not liable for any health decisions you make based on our app's suggestions. We may suspend or terminate your account if you violate these terms.</p>
+            </div>
+        ),
+        privacy: (
+             <div className="space-y-4 text-sm text-text-secondary">
+                <p>Your privacy is paramount. We collect personal data (profile, meal inputs) and usage data to provide and improve our service. All personal health information is encrypted at rest and in transit.</p>
+                <p>We do not sell your personal data. We may share anonymized, aggregated data for research purposes. You have the right to access, correct, or delete your personal data at any time by contacting us.</p>
+            </div>
+        ),
+        disclaimer: (
+            <div className="space-y-4 text-sm text-text-secondary">
+                <p>The information provided by NutriGuide AI is for educational and informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.</p>
+                <p>Never disregard professional medical advice or delay in seeking it because of something you have read on this application. If you have a medical emergency, call your doctor or emergency services immediately.</p>
+                <p>Reliance on any information provided by NutriGuide AI is solely at your own risk.</p>
+            </div>
+        )
+    };
 
     return (
         <div className="animate-fade-in space-y-8">
@@ -76,13 +105,15 @@ const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme
                         icon={Zap}
                         title="Connect Wearables"
                         description="Sync data from Apple Health, Google Fit, and more."
-                        onClick={() => onShowToast('Wearable integration is coming soon!')}
+                        onClick={handleConnectWearables}
+                        status={userProfile.wearableStatus || 'not_connected'}
                     />
                     <SettingsItem
                         icon={Dna}
                         title="Manage Genetic Data"
                         description="Connect or disconnect your genetics information."
-                        onClick={() => onShowToast('Genetic data management is coming soon!')}
+                        onClick={() => {}}
+                        status={userProfile.geneticsDataStatus || 'not_connected'}
                     />
                 </SettingsSection>
 
@@ -91,19 +122,19 @@ const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme
                         icon={FileText}
                         title="Terms of Service"
                         description="Read our terms and conditions."
-                        onClick={() => onShowToast('Displaying Terms of Service soon!')}
+                        onClick={() => onShowInfo('Terms of Service', legalContent.terms)}
                     />
                     <SettingsItem
                         icon={Shield}
                         title="Privacy Policy"
                         description="Read about how we protect your data."
-                        onClick={() => onShowToast('Displaying Privacy Policy soon!')}
+                        onClick={() => onShowInfo('Privacy Policy', legalContent.privacy)}
                     />
                      <SettingsItem
                         icon={AlertTriangle}
                         title="Medical Disclaimer"
                         description="Important information about the scope of our advice."
-                        onClick={() => onShowToast('Displaying Medical Disclaimer soon!')}
+                        onClick={() => onShowInfo('Medical Disclaimer', legalContent.disclaimer)}
                     />
                 </SettingsSection>
             </div>
@@ -122,23 +153,42 @@ const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme
 const SettingsSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
     <div>
         <h2 className="text-xl font-bold text-secondary mb-3">{title}</h2>
-        <div className="bg-surface rounded-2xl border border-border-color shadow-lg shadow-slate-200/50 overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-border-color shadow-lg shadow-slate-200/50 overflow-hidden divide-y divide-border-color">
             {children}
         </div>
     </div>
 );
 
-const SettingsItem: React.FC<{ icon: React.FC<{className?:string}>; title: string; description: string; onClick: () => void }> = ({ icon: Icon, title, description, onClick }) => (
-    <button onClick={onClick} className="flex items-center w-full text-left p-4 hover:bg-background transition-colors group">
-        <div className="w-10 h-10 bg-accent/50 rounded-lg flex items-center justify-center mr-4">
-            <Icon className="w-6 h-6 text-primary" />
-        </div>
-        <div className="flex-grow">
-            <p className="font-bold text-text-primary">{title}</p>
-            <p className="text-sm text-text-secondary">{description}</p>
-        </div>
-            <svg className="w-5 h-5 text-text-muted transition-transform transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-);
+const SettingsItem: React.FC<{ icon: React.FC<{className?:string}>; title: string; description: string; onClick: () => void, status?: string }> = ({ icon: Icon, title, description, onClick, status }) => {
+    
+    const renderStatus = () => {
+        if (!status) {
+            return <svg className="w-5 h-5 text-text-muted transition-transform transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>;
+        }
+        switch (status) {
+            case 'pending':
+                return <Loader className="w-5 h-5 text-primary animate-spin" />;
+            case 'connected':
+                return <span className="text-sm font-bold text-primary flex items-center gap-1"><CheckCircle className="w-5 h-5"/> Connected</span>;
+            default:
+                 return <span className="text-sm font-bold text-text-secondary">Connect</span>;
+        }
+    };
+
+    return (
+        <button onClick={onClick} disabled={status === 'pending' || status === 'connected'} className="flex items-center w-full text-left p-4 hover:bg-background transition-colors group disabled:pointer-events-none">
+            <div className="w-10 h-10 bg-accent/50 rounded-lg flex items-center justify-center mr-4">
+                <Icon className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-grow">
+                <p className="font-bold text-text-primary">{title}</p>
+                <p className="text-sm text-text-secondary">{description}</p>
+            </div>
+            <div className="ml-4">
+                 {renderStatus()}
+            </div>
+        </button>
+    );
+};
 
 export default Settings;
