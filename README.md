@@ -10,10 +10,7 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge">
 </p>
 
-<p align="center">
-  <img src="https://i.imgur.com/k2sHhZN.gif" alt="NutriGuide AI App Showcase" width="600"/>
-</p>
-
+![NutriGuide AI Banner 2](https://raw.githubusercontent.com/senushidinara/Nutriguide/main/IMG_7852.jpeg)
 ---
 
 🎉 Welcome to the official repository for **NutriGuide AI**! 🎉 This isn't just another calorie counter. NutriGuide AI is a revolutionary wellness platform that acts as your personal health co-pilot. By creating a unique **"Body Blueprint"** 🧬 and leveraging a powerful **"Micro-Simulation Engine"** ⚡ powered by Google's Gemini models, we forecast how any meal will impact your energy, focus, and mood—up to 24 hours in advance.
