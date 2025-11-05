@@ -1,7 +1,7 @@
 # 🌟 NutriGuide AI: Your Predictive Wellness Co-pilot 🌟
 
 <p align="center">
-  <img src="https://i.imgur.com/g4gP7k5.png" alt="NutriGuide AI Banner" width="800"/>
+  <img src="https://i.imgur.com/8L1w5gC.png" alt="NutriGuide AI Banner" width="800"/>
 </p>
 
 <p align="center">
@@ -12,6 +12,10 @@
   <img alt="Tech Stack" src="https://img.shields.io/badge/Tech%20Stack-Google%20Gemini%20%7C%20React%20%7C%20GCP-blueviolet?style=for-the-badge">
   <img alt="Platform" src="https://img.shields.io/badge/Platform-WebApp-green?style=for-the-badge">
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge">
+</p>
+
+<p align="center">
+  <img src="https://i.imgur.com/k2sHhZN.gif" alt="NutriGuide AI App Showcase" width="600"/>
 </p>
 
 ---
@@ -33,14 +37,14 @@
 
 ## 🚀 Core Features
 
-- **⚡ Meal Simulation Engine:** Compose a meal and watch our AI predict its future impact on your body in stunning detail.
-- **📊 Interactive Wellness Dashboard:** Your daily command center with a dynamic Wellness Score, macro tracking, and mind-blowing AI insights.
-- **🧬 Genetics & Microbiome Integration:** A forward-looking feature to connect your health data for an unprecedented level of personalization.
-- **🏆 Community & Gamification:** Stay motivated with awesome achievements and a friendly weekly leaderboard.
+- **⚡ Live Simulation Engine:** Compose a meal and watch our AI predict its future impact on your body in stunning detail. The dashboard updates in real-time!
+- **📊 Dynamic Wellness Dashboard:** Your daily command center with a Wellness Score, macro tracking, and mind-blowing AI insights that change based on your actions.
+- **🧬 Genetics & Microbiome Integration:** A fully interactive feature to connect your health data for an unprecedented level of personalization.
+- **🏆 Community & Gamification:** Stay motivated with awesome achievements and a friendly weekly leaderboard. All buttons are fully interactive!
 - **🎨 Advanced Theming Engine:** Completely customize the app's look and feel! Choose from 6 stunning themes (including a sleek dark mode!) that change colors, fonts, and even animated backgrounds.
 - **💬 AI Chat with Grounding:** Ask complex questions and get real-time, sourced information about nutrition, health, and local food options.
-- **🔍 Smart Nutrient Library:** A beautiful library of ingredients with a powerful, instantaneous search function.
-- **🔐 Privacy First:** You are in complete control of your data with robust privacy features and crystal-clear disclaimers.
+- **🔍 Smart Nutrient Library:** A beautiful library of high-quality food images with a powerful, instantaneous search function.
+- **🔐 Privacy First & Persistent State:** You are in complete control of your data, and the app saves your progress, so you can pick up right where you left off.
 
 ---
 

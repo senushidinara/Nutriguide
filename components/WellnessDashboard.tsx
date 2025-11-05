@@ -12,7 +12,7 @@ interface WellnessDashboardProps {
 
 const WellnessDashboard: React.FC<WellnessDashboardProps> = ({ userProfile, onNavigate, onShowReport, currentFont }) => {
     
-    const wellnessScore = 88; // Mock data
+    const wellnessScore = userProfile.lastWellnessScore ?? 0;
     
     return (
         <div className="space-y-8 animate-fade-in">
@@ -29,13 +29,16 @@ const WellnessDashboard: React.FC<WellnessDashboardProps> = ({ userProfile, onNa
                      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-[shimmer_4s_infinite]"></div>
 
                     <div className="relative z-10">
-                        <h2 className={`text-xl font-bold text-accent ${currentFont}`}>Daily Wellness Score</h2>
+                        <h2 className={`text-xl font-bold text-accent ${currentFont}`}>{ wellnessScore > 0 ? "Last Meal's Wellness Score" : "Daily Wellness Score"}</h2>
                         <div className="text-7xl font-extrabold my-2 flex items-baseline">
                             <AnimatedScore value={wellnessScore} />
                             <span className="text-4xl opacity-50">/100</span>
                         </div>
                         <p className="max-w-md text-emerald-100">
-                            Your score is trending up! Your recent meal choices are aligning well with your goal to {userProfile.goal.replace(/_/g, ' ')}.
+                             { wellnessScore > 0 ?
+                                `Your last meal aligned well with your goal to ${userProfile.goal.replace(/_/g, ' ')}.` :
+                                "Run a simulation to see your first wellness score."
+                            }
                         </p>
                     </div>
                      <button 
@@ -48,11 +51,11 @@ const WellnessDashboard: React.FC<WellnessDashboardProps> = ({ userProfile, onNa
                 
                 {/* Macros */}
                 <div className="bg-surface rounded-2xl p-8 border border-border-color shadow-lg shadow-slate-200/50">
-                    <h3 className={`text-lg font-bold text-secondary mb-4 ${currentFont}`}>Macro Tracker</h3>
+                    <h3 className={`text-lg font-bold text-secondary mb-4 ${currentFont}`}>Last Meal's Macros</h3>
                     <div className="space-y-4 animate-slide-in-up" style={{animationDelay: '200ms'}}>
-                        <MacroItem label="Protein" value={80} goal={120} unit="g" color="bg-sky-500" />
-                        <MacroItem label="Carbs" value={150} goal={200} unit="g" color="bg-amber-500" />
-                        <MacroItem label="Fats" value={40} goal={60} unit="g" color="bg-rose-500" />
+                        <MacroItem label="Protein" value={Math.round(userProfile.lastMacros.protein)} goal={120} unit="g" color="bg-sky-500" />
+                        <MacroItem label="Carbs" value={Math.round(userProfile.lastMacros.carbs)} goal={200} unit="g" color="bg-amber-500" />
+                        <MacroItem label="Fats" value={Math.round(userProfile.lastMacros.fats)} goal={60} unit="g" color="bg-rose-500" />
                     </div>
                 </div>
             </div>

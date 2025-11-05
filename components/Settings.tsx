@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { UserProfile, ThemeName } from '../types';
 import UserProfileModal from './UserProfileModal';
@@ -7,7 +6,7 @@ import { themes } from '../themes';
 
 interface SettingsProps {
     userProfile: UserProfile;
-    onProfileUpdate: (profile: UserProfile) => void;
+    onProfileUpdate: (profile: Partial<UserProfile>) => void;
     theme: ThemeName;
     onThemeChange: (theme: ThemeName) => void;
     onShowInfo: (title: string, content: React.ReactNode) => void;
@@ -18,6 +17,11 @@ interface SettingsProps {
 
 const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme, onThemeChange, onShowInfo, onManageData, onConnectWearables, currentFont }) => {
     const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+    
+    const handleProfileUpdateAndClose = (profile: UserProfile) => {
+        onProfileUpdate(profile);
+        setProfileModalOpen(false);
+    };
     
     const legalContent = {
         terms: (
@@ -138,7 +142,7 @@ const Settings: React.FC<SettingsProps> = ({ userProfile, onProfileUpdate, theme
                 <UserProfileModal 
                     currentUserProfile={userProfile}
                     onClose={() => setProfileModalOpen(false)}
-                    onSubmit={onProfileUpdate}
+                    onSubmit={handleProfileUpdateAndClose}
                 />
             )}
         </div>
@@ -165,7 +169,7 @@ const SettingsItem: React.FC<{ icon: React.FC<{className?:string}>; title: strin
                 <p className="text-sm text-text-secondary">{description}</p>
             </div>
             <div className="ml-4">
-                 <svg className="w-5 h-5 text-text-muted transition-transform transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                 <svg className="w-5 h-5 text-text-muted transition-transform transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
         </button>
     );

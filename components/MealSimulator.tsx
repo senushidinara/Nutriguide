@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { UserProfile, FoodItem, SimulationResult, ChatMessage, SavedMeal, GroundingSource } from '../types';
 import FoodSelector from './FoodSelector';
@@ -14,13 +13,15 @@ import { ServerCrash, ArrowLeft } from './icons';
 
 interface MealSimulatorProps {
   userProfile: UserProfile;
-  onProfileUpdate: (profile: UserProfile) => void;
+  onProfileUpdate: (profile: Partial<UserProfile>) => void;
   currentFont: 'font-sans' | 'font-serif';
   getChatResponse: (message: string, location: {latitude: number, longitude: number} | null) => Promise<{ text: string, groundingSources?: GroundingSource[] }>;
   userLocation: {latitude: number, longitude: number} | null;
+  onSimulationComplete: (result: SimulationResult, meal: FoodItem[]) => void;
+  addToast: (message: string, type?: 'success' | 'error') => void;
 }
 
-const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfile, onProfileUpdate, currentFont, userLocation }) => {
+const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfile, onProfileUpdate, currentFont, userLocation, onSimulationComplete, addToast }) => {
   const [userProfile, setUserProfile] = useState<UserProfile>(initialProfile);
   const [currentMeal, setCurrentMeal] = useState<FoodItem[]>([]);
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
@@ -48,7 +49,11 @@ const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfi
   };
   
   const handleAddFoodWithQuantity = (food: Omit<FoodItem, 'quantity' | 'unit'>, quantity: string, unit: string) => {
-    if (currentMeal.find(item => item.id === food.id)) return;
+    if (currentMeal.find(item => item.id === food.id)) {
+        addToast(`${food.name} is already in your meal.`, 'error');
+        setFoodForQuantity(null);
+        return;
+    };
     setCurrentMeal(prev => [...prev, { ...food, quantity, unit }]);
     setFoodForQuantity(null);
   };
@@ -112,18 +117,26 @@ const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfi
         const updatedSavedMeals = [newSavedMeal, ...savedMeals];
         setSavedMeals(updatedSavedMeals);
         localStorage.setItem('nutriGuideSavedMeals', JSON.stringify(updatedSavedMeals));
+        addToast(`Meal "${mealName}" saved successfully!`);
     }
   };
   
   const handleLoadMeal = (meal: SavedMeal) => {
     setCurrentMeal(meal.foods);
     setSimulationResult(null);
+    addToast(`Loaded meal: "${meal.name}"`);
   }
 
   const handleBackToBuilder = () => {
     setSimulationResult(null);
     setError(null);
   }
+  
+  const handleConfirmAndFinish = () => {
+      if (simulationResult) {
+          onSimulationComplete(simulationResult, currentMeal);
+      }
+  };
 
   const removeFoodFromMeal = (foodId: string) => {
     setCurrentMeal(prev => prev.filter(item => item.id !== foodId));
@@ -147,9 +160,9 @@ const MealSimulator: React.FC<MealSimulatorProps> = ({ userProfile: initialProfi
     if (simulationResult) {
       return (
          <div className="w-full animate-fade-in">
-            <button onClick={handleBackToBuilder} className="absolute top-5 left-5 z-20 flex items-center gap-2 bg-surface/70 backdrop-blur-sm hover:bg-background text-text-secondary font-bold py-2 px-4 rounded-full transition-colors border border-border-color">
+            <button onClick={handleConfirmAndFinish} className="absolute top-5 left-5 z-20 flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded-full transition-colors border border-border-color shadow-lg">
                 <ArrowLeft className="w-5 h-5" />
-                New Simulation
+                Confirm & View on Dashboard
             </button>
             <SimulationDisplay result={simulationResult} onOpenChat={() => setIsChatOpen(true)} onSaveMeal={handleSaveMeal} />
         </div>

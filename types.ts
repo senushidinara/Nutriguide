@@ -12,6 +12,22 @@ export interface UserProfile {
   geneticsDataStatus: 'not_connected' | 'pending' | 'connected';
   microbiomeDataStatus: 'not_connected' | 'pending' | 'connected';
   wearableStatus: 'not_connected' | 'pending' | 'connected';
+  lastWellnessScore: number | null;
+  lastMacros: { protein: number, carbs: number, fats: number };
+}
+
+export interface AppState {
+    userProfile: UserProfile | null;
+    activeView: AppView;
+    theme: ThemeName;
+    lastSimulationResult: SimulationResult | null;
+    hasCompletedOnboarding: boolean;
+}
+
+export interface Toast {
+    id: number;
+    message: string;
+    type: 'success' | 'error';
 }
 
 export interface FoodItem {

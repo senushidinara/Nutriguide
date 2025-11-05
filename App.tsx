@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { UserProfile, AppView, ThemeName, Achievement, LeaderboardUser } from './types';
+import { UserProfile, AppView, ThemeName, Achievement, LeaderboardUser, SimulationResult, Toast, AppState } from './types';
 import UserProfileSetup from './components/UserProfileSetup';
 import Layout from './components/Layout';
 import WellnessDashboard from './components/WellnessDashboard';
@@ -14,28 +14,38 @@ import ConnectionModal from './components/ConnectionModal';
 import AchievementDetailModal from './components/AchievementDetailModal';
 import CommunityProfileModal from './components/CommunityProfileModal';
 import DataManagementModal from './components/DataManagementModal';
+import OnboardingTour from './components/OnboardingTour';
+import ToastComponent from './components/Toast';
 import { themes } from './themes';
 import { getChatResponse } from './services/geminiService';
 
 
 const App: React.FC = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
+  const [appState, setAppState] = useState<AppState>(() => {
     try {
-      const savedProfile = localStorage.getItem('nutriGuideProfile');
-      const profile = savedProfile ? JSON.parse(savedProfile) : null;
-      // Ensure all connection statuses are present
-      if (profile) {
-        profile.geneticsDataStatus = profile.geneticsDataStatus || 'not_connected';
-        profile.microbiomeDataStatus = profile.microbiomeDataStatus || 'not_connected';
-        profile.wearableStatus = profile.wearableStatus || 'not_connected';
+      const savedState = localStorage.getItem('nutriGuideState');
+      if (savedState) {
+        const parsedState = JSON.parse(savedState);
+        // Ensure all connection statuses are present from older versions
+         if (parsedState.userProfile) {
+            parsedState.userProfile.geneticsDataStatus = parsedState.userProfile.geneticsDataStatus || 'not_connected';
+            parsedState.userProfile.microbiomeDataStatus = parsedState.userProfile.microbiomeDataStatus || 'not_connected';
+            parsedState.userProfile.wearableStatus = parsedState.userProfile.wearableStatus || 'not_connected';
+        }
+        return parsedState;
       }
-      return profile;
     } catch (error) {
-      return null;
+      console.error("Failed to load state from localStorage", error);
     }
+    return {
+        userProfile: null,
+        activeView: 'dashboard',
+        theme: 'emerald',
+        lastSimulationResult: null,
+        hasCompletedOnboarding: false,
+    };
   });
-
-  const [activeView, setActiveView] = useState<AppView>('dashboard');
+  
   const [isDisclaimerOpen, setDisclaimerOpen] = useState<boolean>(() => {
     return localStorage.getItem('nutriGuideDisclaimerAccepted') !== 'true';
   });
@@ -48,20 +58,32 @@ const App: React.FC = () => {
   const [achievementModalContent, setAchievementModalContent] = useState<Achievement | null>(null);
   const [communityProfileModalContent, setCommunityProfileModalContent] = useState<LeaderboardUser | null>(null);
 
-
-  const [theme, setTheme] = useState<ThemeName>(() => {
-    const savedTheme = localStorage.getItem('nutriGuideTheme') as ThemeName;
-    return savedTheme && themes[savedTheme] ? savedTheme : 'emerald';
-  });
+  const [toasts, setToasts] = useState<Toast[]>([]);
   
   const [userLocation, setUserLocation] = useState<{latitude: number, longitude: number} | null>(null);
 
   useEffect(() => {
-    if (userProfile) {
-        localStorage.setItem('nutriGuideProfile', JSON.stringify(userProfile));
-    }
-  }, [userProfile]);
+    localStorage.setItem('nutriGuideState', JSON.stringify(appState));
+  }, [appState]);
   
+  const addToast = (message: string, type: 'success' | 'error' = 'success') => {
+    const id = new Date().getTime();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+    }, 3000);
+  };
+  
+  const updateState = <K extends keyof AppState>(key: K, value: AppState[K]) => {
+    setAppState(prev => ({ ...prev, [key]: value }));
+  };
+  
+  const updateUserProfile = (updates: Partial<UserProfile>) => {
+    if (appState.userProfile) {
+        updateState('userProfile', { ...appState.userProfile, ...updates });
+    }
+  };
+
   useEffect(() => {
      navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -77,34 +99,28 @@ const App: React.FC = () => {
   }, []);
   
   useEffect(() => {
-    const activeTheme = themes[theme];
+    const activeTheme = themes[appState.theme];
     const root = document.documentElement;
     
-    // Apply colors
     for (const [key, value] of Object.entries(activeTheme.colors)) {
         root.style.setProperty(key, value as string);
     }
-
-    // Apply fonts
     for (const [key, value] of Object.entries(activeTheme.fonts)) {
         root.style.setProperty(key, value as string);
     }
-    
-    // Apply background
     root.style.setProperty('--background-gradient', activeTheme.background);
-
-    localStorage.setItem('nutriGuideTheme', theme);
-  }, [theme]);
+  }, [appState.theme]);
   
-  const handleProfileSubmit = (profile: UserProfile) => {
-    const fullProfile = {
-        ...userProfile,
+  const handleProfileSubmit = (profile: Omit<UserProfile, 'geneticsDataStatus' | 'microbiomeDataStatus' | 'wearableStatus' | 'lastWellnessScore' | 'lastMacros'>) => {
+    const fullProfile: UserProfile = {
         ...profile,
-        geneticsDataStatus: userProfile?.geneticsDataStatus || 'not_connected',
-        microbiomeDataStatus: userProfile?.microbiomeDataStatus || 'not_connected',
-        wearableStatus: userProfile?.wearableStatus || 'not_connected'
+        geneticsDataStatus: 'not_connected',
+        microbiomeDataStatus: 'not_connected',
+        wearableStatus: 'not_connected',
+        lastWellnessScore: null,
+        lastMacros: { protein: 0, carbs: 0, fats: 0 }
     };
-    setUserProfile(fullProfile);
+    updateState('userProfile', fullProfile);
   };
 
   const handleDisclaimerAccept = () => {
@@ -120,8 +136,8 @@ const App: React.FC = () => {
     type: 'geneticsDataStatus' | 'microbiomeDataStatus' | 'wearableStatus',
     status: 'not_connected' | 'pending' | 'connected'
   ) => {
-    if (userProfile) {
-      setUserProfile(prev => prev ? { ...prev, [type]: status } : null);
+    if (appState.userProfile) {
+      updateUserProfile({ [type]: status });
     }
   };
 
@@ -134,18 +150,52 @@ const App: React.FC = () => {
     if (type === 'microbiome') handleUpdateConnectionStatus('microbiomeDataStatus', 'connected');
     if (type === 'wearables') handleUpdateConnectionStatus('wearableStatus', 'connected');
     setConnectionModalOpen({ isOpen: false, type: null });
+    addToast(`${type.charAt(0).toUpperCase() + type.slice(1)} data connected successfully!`);
+  };
+
+  const handleSimulationComplete = (result: SimulationResult, meal: any[]) => {
+      const macros = meal.reduce((acc, item) => {
+          const quantityFactor = parseFloat(item.quantity) / 100; // Assuming nutrition is per 100g/ml
+          acc.protein += item.nutrition.protein * quantityFactor;
+          acc.carbs += item.nutrition.carbohydrates * quantityFactor;
+          acc.fats += item.nutrition.fat * quantityFactor;
+          return acc;
+      }, { protein: 0, carbs: 0, fats: 0 });
+
+      updateState('lastSimulationResult', result);
+      updateUserProfile({ 
+          lastWellnessScore: result.energy_optimization_score,
+          lastMacros: macros
+      });
+      updateState('activeView', 'dashboard');
   };
 
   const renderContent = () => {
-    const currentFont = themes[theme].fonts['--font-family-sans'].includes('Lora') ? 'font-serif' : 'font-sans';
-    switch (activeView) {
+    const currentFont = themes[appState.theme].fonts['--font-family-sans'].includes('Lora') ? 'font-serif' : 'font-sans';
+    switch (appState.activeView) {
       case 'dashboard':
-        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowReport={() => setWeeklyReportOpen(true)} currentFont={currentFont} />;
+        return <WellnessDashboard 
+                    userProfile={appState.userProfile!} 
+                    onNavigate={(view) => updateState('activeView', view)} 
+                    onShowReport={() => setWeeklyReportOpen(true)} 
+                    currentFont={currentFont} 
+                />;
       case 'simulator':
-        return <MealSimulator userProfile={userProfile!} onProfileUpdate={handleProfileSubmit} currentFont={currentFont} getChatResponse={getChatResponse} userLocation={userLocation}/>;
+        return <MealSimulator 
+                    userProfile={appState.userProfile!} 
+                    onProfileUpdate={(updates) => {
+                        updateUserProfile(updates);
+                        addToast("Body Blueprint updated successfully!");
+                    }} 
+                    currentFont={currentFont} 
+                    getChatResponse={getChatResponse} 
+                    userLocation={userLocation}
+                    onSimulationComplete={handleSimulationComplete}
+                    addToast={addToast}
+                />;
       case 'genetics':
         return <GeneticsMicrobiome 
-                    userProfile={userProfile!} 
+                    userProfile={appState.userProfile!} 
                     onConnect={handleOpenConnectionModal}
                     currentFont={currentFont}
                 />;
@@ -157,20 +207,23 @@ const App: React.FC = () => {
                 />;
       case 'settings':
         return <Settings 
-                    userProfile={userProfile!} 
-                    onProfileUpdate={handleProfileSubmit} 
-                    theme={theme} 
-                    onThemeChange={setTheme} 
+                    userProfile={appState.userProfile!} 
+                    onProfileUpdate={(updates) => {
+                        updateUserProfile(updates);
+                        addToast("Body Blueprint updated successfully!");
+                    }} 
+                    theme={appState.theme} 
+                    onThemeChange={(theme) => updateState('theme', theme)} 
                     onShowInfo={handleShowInfoModal}
                     onManageData={() => setDataManagementModalOpen(true)}
                     onConnectWearables={() => handleOpenConnectionModal('wearables')}
                     currentFont={currentFont} />;
       default:
-        return <WellnessDashboard userProfile={userProfile!} onNavigate={setActiveView} onShowReport={() => setWeeklyReportOpen(true)} currentFont={currentFont}/>;
+        return <WellnessDashboard userProfile={appState.userProfile!} onNavigate={(view) => updateState('activeView', view)} onShowReport={() => setWeeklyReportOpen(true)} currentFont={currentFont}/>;
     }
   };
 
-  if (!userProfile) {
+  if (!appState.userProfile) {
     return (
       <>
         {isDisclaimerOpen && <DisclaimerModal onClose={handleDisclaimerAccept} />}
@@ -182,10 +235,18 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen w-full antialiased relative">
        {isDisclaimerOpen && <DisclaimerModal onClose={handleDisclaimerAccept} />}
-       <Layout activeView={activeView} setActiveView={setActiveView}>
+       {!appState.hasCompletedOnboarding && <OnboardingTour onClose={() => updateState('hasCompletedOnboarding', true)} />}
+       
+       <Layout activeView={appState.activeView} setActiveView={(view) => updateState('activeView', view)}>
          {renderContent()}
        </Layout>
        
+       <div className="fixed top-4 right-4 z-[100] w-full max-w-sm">
+            {toasts.map(toast => (
+                <ToastComponent key={toast.id} message={toast.message} type={toast.type} onClose={() => setToasts(p => p.filter(t => t.id !== toast.id))} />
+            ))}
+        </div>
+
        {isWeeklyReportOpen && <WeeklyReportModal onClose={() => setWeeklyReportOpen(false)} />}
        {infoModalContent && <InfoModal title={infoModalContent.title} onClose={() => setInfoModalContent(null)}>{infoModalContent.content}</InfoModal>}
        {isConnectionModalOpen.isOpen && (
@@ -197,7 +258,7 @@ const App: React.FC = () => {
         )}
         {isDataManagementModalOpen && (
             <DataManagementModal
-                userProfile={userProfile}
+                userProfile={appState.userProfile}
                 onClose={() => setDataManagementModalOpen(false)}
                 onUpdateStatus={handleUpdateConnectionStatus}
             />
